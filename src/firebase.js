@@ -1,3 +1,6 @@
+// ALL FIREBASE AUTHENTICATION FUNCTIONALITY BASED ON THE TUTORIAL BY WEB DEV SIMPLIFIED
+// THIS TUTORIAL CAN BE FOUND AT https://www.youtube.com/watch?v=PKwu15ldZ7k
+
 import firebase from 'firebase/app'
 import 'firebase/auth'
 
