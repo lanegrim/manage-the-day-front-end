@@ -1,0 +1,19 @@
+/* .contains-all {
+    max-width: 400px;
+} */
+
+.columns {
+    display: flex;
+    overflow-x: scroll;
+    gap: 5%;
+}
+
+.board-column {
+    min-width: 350px;
+    min-height: 500px;
+}
+
+.columns-page {
+    margin: 0;
+    width: 100vw;
+}

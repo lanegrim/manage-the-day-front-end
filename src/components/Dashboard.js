@@ -22,7 +22,7 @@ export default function Dashboard() {
         }
     }
     return (
-        <>
+        <div style={{ maxWidth: "400px" }}>
             <Card>
                 <Card.Body>
                     <h2 className="text-center mb-4">
@@ -41,6 +41,6 @@ export default function Dashboard() {
             <div className="w-100 text-center mt-2">
                 <Button variant="link" onClick={handleLogout}>Log Out</Button>
             </div>
-        </>
+        </div>
     )
 }
