@@ -8,6 +8,7 @@ export default function Board() {
     const { id } = useParams()
     const [board, setBoard] = useState({ columns: [], id: '' })
     const [currentItemID, setCurrentItemID] = useState('')
+    const [loading, setLoading] = useState(false)
     const [currentItemName, setCurrentItemName] = useState('')
     const columnNameRef = useRef()
     const [showEditColumnModal, setShowEditColumnModal] = useState(false)
@@ -38,8 +39,6 @@ export default function Board() {
 
     function editColumn(event) {
         event.preventDefault();
-        console.log(board.id)
-        console.log(columnNameRef.current.value)
         const updatedColumn = {
             board_id: board.id,
             title: columnNameRef.current.value
@@ -65,6 +64,25 @@ export default function Board() {
             .then((response) => {
                 getBoard(board.id);
             });
+    }
+
+    function addColumn(event) {
+        event.preventDefault()
+        setLoading(true)
+
+        const newColumn = {
+            title: columnNameRef.current.value,
+            board_id: board.id
+        }
+
+        axios.post('https://managetheday-api.herokuapp.com/columns', newColumn)
+            .then((response) => {
+                getBoard(board.id)
+                setLoading(false)
+            },
+                (err) => console.error(err)
+            )
+            .catch((error) => console.error(error))
     }
 
 
@@ -124,6 +142,23 @@ export default function Board() {
                         </Card>
                     )
                 })}
+                <Card>
+                    <Card.Header>Add a New Column</Card.Header>
+                    <Card.Body>
+                        <form onSubmit={addColumn}>
+                            <Form.Group id="boardName">
+                                <Form.Control
+                                    type="text"
+                                    ref={columnNameRef}
+                                    required
+                                    placeholder='Name Your New Column' />
+                            </Form.Group>
+                            <Button className="w-100 mt-2" type="submit" variant='success' disabled={loading}>
+                                Create Column
+                                </Button>
+                        </form>
+                    </Card.Body>
+                </Card>
             </div>
         </>
     )
