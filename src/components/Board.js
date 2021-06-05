@@ -57,6 +57,17 @@ export default function Board() {
             .catch((error) => console.error(error));
     }
 
+    function deleteColumn() {
+        axios
+            .delete(
+                "https://managetheday-api.herokuapp.com/columns/" + currentItemID
+            )
+            .then((response) => {
+                getBoard(board.id);
+            });
+    }
+
+
     useEffect(() => {
         fetch(`http://localhost:5000/boards/${id}`)
             .then(
@@ -103,6 +114,9 @@ export default function Board() {
                                                     Update Column
                                                 </Button>
                                             </form>
+                                            <Button className="w-100 mt-2" variant='danger' onClick={deleteColumn}>
+                                                Delete Column
+                                                </Button>
                                         </Modal.Body>
                                     </Modal>
                                 </ListGroup>
