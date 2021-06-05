@@ -36,8 +36,6 @@ export default function BoardSelect() {
             .then(
                 (response) => {
                     setBoards(response.data.boards)
-                    console.log(response.data.boards)
-                    console.log(currentUser.email)
                 },
                 (err) => console.error(err)
             )

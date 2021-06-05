@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { Card, ListGroup, ListGroupItem, Button, Modal, Form } from 'react-bootstrap'
-import { useParams } from 'react-router-dom'
+import { Card, ListGroup, ListGroupItem, Button, Modal, Form, Container } from 'react-bootstrap'
+import { useParams, Link } from 'react-router-dom'
 import axios from 'axios'
 
 
@@ -96,8 +96,11 @@ export default function Board() {
     }, [id])
 
     return (
-        <>
+        <Container>
             <h1 className="text-center">{board.title}</h1>
+            <div className="w-100 text-center mt-2">
+                <Link to="/">Return to Board Selector</Link>
+            </div>
             <div className="columns">
                 {board.columns.map((column) => {
                     return (
@@ -162,6 +165,6 @@ export default function Board() {
                     </Card.Body>
                 </Card>
             </div>
-        </>
+        </Container>
     )
 }
