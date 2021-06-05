@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { Card, Container, ListGroup, ListGroupItem, Button, Alert, Form } from 'react-bootstrap'
+import { Card, Container, ListGroup, ListGroupItem, Button, Alert, Form, Modal } from 'react-bootstrap'
 import axios from "axios";
-import { Link, useHistory } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 
 export default function BoardSelect() {
@@ -12,19 +12,17 @@ export default function BoardSelect() {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
     const [boards, setBoards] = useState([])
+    const [boardID, setBoardID] = useState('')
+    const [boardName, setBoardName] = useState('')
+    const [showEditModal, setShowEditModal] = useState(false)
 
-
-    const linkStyle = {
-        textDecoration: 'none',
-        color: 'white'
-    }
 
     async function handleLogout() {
         setError('')
 
         try {
             await logout()
-            history.pushState('/login')
+            history.push('/login')
         } catch {
             setError('Failed to log out')
         }
@@ -41,6 +39,48 @@ export default function BoardSelect() {
             )
             .catch((error) => console.error(error));
     };
+
+    function openEditModal(event) {
+        setBoardID(event.target.id)
+        setBoardName(event.target.name)
+        setShowEditModal(true)
+    }
+
+    function closeEditModal(event) {
+        setBoardID('')
+        setBoardName('')
+        setShowEditModal(false)
+    }
+
+    function editBoard(event) {
+        event.preventDefault();
+        const updatedBoard = {
+            owner: currentUser.email,
+            title: boardNameRef.current.value
+        }
+
+        axios
+            .put(
+                "https://managetheday-api.herokuapp.com/boards/" + boardID,
+                updatedBoard
+            )
+            .then((response) => {
+                getBoards()
+                closeEditModal()
+            })
+            .catch((error) => console.error(error));
+    }
+
+    function deleteBoard() {
+        axios
+            .delete(
+                "https://managetheday-api.herokuapp.com/boards/" + boardID
+            )
+            .then((response) => {
+                getBoards()
+                closeEditModal()
+            });
+    }
 
     function addBoard(event) {
         event.preventDefault()
@@ -65,7 +105,8 @@ export default function BoardSelect() {
     }, [])
 
     return (
-        <Container>
+        <Container className='text-center'>
+            <h1>My Boards</h1>
             <Card>
                 <Card.Header>Select a Board</Card.Header>
                 <Card.Body>
@@ -73,15 +114,36 @@ export default function BoardSelect() {
                         {boards.map((board) => {
                             if (board.owner === currentUser.email) {
                                 return <ListGroupItem key={board.id}>
-                                    <Button className='w-100'>
-                                        <Link
-                                            to={{
-                                                pathname: `/boards/${board.id}`,
-                                            }}
-                                            style={linkStyle}>
-                                            <strong>{board.title}</strong>
-                                        </Link>
+                                    <Button onClick={() => { history.push(`/boards/${board.id}`) }}>
+                                        <strong>{board.title}</strong>
                                     </Button>
+                                    <Button
+                                        onClick={openEditModal}
+                                        id={board.id}
+                                        name={board.title}> Edit </Button>
+                                    <Modal show={showEditModal} onHide={closeEditModal} centered>
+                                        <Modal.Header closeButton>
+                                            <Modal.Title>Edit "{boardName}"</Modal.Title>
+                                        </Modal.Header>
+                                        <Modal.Body>
+                                            <form onSubmit={editBoard}>
+                                                <Form.Group id="columnName">
+                                                    <Form.Label>Board title</Form.Label>
+                                                    <Form.Control
+                                                        type="text"
+                                                        ref={boardNameRef}
+                                                        required
+                                                        defaultValue={boardName} />
+                                                </Form.Group>
+                                                <Button className="w-100 mt-2" type="submit" variant='success'>
+                                                    Update Board
+                                                </Button>
+                                            </form>
+                                            <Button className="w-100 mt-2" variant='danger' onClick={deleteBoard}>
+                                                Delete Board
+                                                </Button>
+                                        </Modal.Body>
+                                    </Modal>
                                 </ListGroupItem>
                             }
                         })}
