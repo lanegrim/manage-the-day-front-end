@@ -76,7 +76,11 @@ export default function BoardSelect() {
                             if (board.owner === currentUser.email) {
                                 return <ListGroupItem key={board.id}>
                                     <Button className='w-100'>
-                                        <Link to={{ pathname: `/boards/${board.id}` }} style={linkStyle}>
+                                        <Link
+                                            to={{
+                                                pathname: `/boards/${board.id}`,
+                                            }}
+                                            style={linkStyle}>
                                             <strong>{board.title}</strong>
                                         </Link>
                                     </Button>
@@ -87,9 +91,13 @@ export default function BoardSelect() {
                             <form onSubmit={addBoard}>
                                 <Form.Group id="boardName">
                                     <Form.Label>Or Add a New Board</Form.Label>
-                                    <Form.Control type="text" ref={boardNameRef} required placeholder='Name Your New Board' />
+                                    <Form.Control
+                                        type="text"
+                                        ref={boardNameRef}
+                                        required
+                                        placeholder='Name Your New Board' />
                                 </Form.Group>
-                                <Button className="w-100 mt-2" type="submit">
+                                <Button className="w-100 mt-2" type="submit" variant='success'>
                                     Create Board
                                 </Button>
                             </form>
@@ -98,7 +106,7 @@ export default function BoardSelect() {
                 </Card.Body>
             </Card>
             <div className="w-100 text-center mt-2">
-                <Button variant="link" onClick={handleLogout}>Log Out</Button>
+                <Button variant="link" onClick={handleLogout} disabled={loading}>Log Out</Button>
                 {error && <Alert variant="danger">{error}</Alert>}
             </div>
         </Container>

@@ -12,6 +12,7 @@ import PrivateRoute from './PrivateRoute'
 import ForgotPassword from './ForgotPassword'
 import UpdateProfile from './UpdateProfile'
 import BoardSelect from './BoardSelect'
+import Board from './Board'
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
             <Switch>
               <PrivateRoute exact path='/' component={BoardSelect} />
               <PrivateRoute path='/dashboard' component={Dashboard} />
+              <PrivateRoute path='/boards/:id' component={Board} />
               <PrivateRoute path='/update-profile' component={UpdateProfile} />
               <Route path='/signup' component={Signup} />
               <Route path='/login' component={Login} />
