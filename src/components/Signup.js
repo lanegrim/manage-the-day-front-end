@@ -2,7 +2,7 @@
 // THIS TUTORIAL CAN BE FOUND AT https://www.youtube.com/watch?v=PKwu15ldZ7k
 
 import React, { useRef, useState } from 'react'
-import { Form, Card, Button, Alert } from 'react-bootstrap'
+import { Form, Card, Button, Alert, Container } from 'react-bootstrap'
 import { useAuth } from '../contexts/AuthContext'
 import { Link, useHistory } from 'react-router-dom'
 
@@ -34,7 +34,7 @@ export default function Signup() {
     }
 
     return (
-        <>
+        <Container style={{ maxWidth: "400px" }}>
             <Card>
                 <Card.Body>
                     <h2 className="text-center mb-4">
@@ -63,6 +63,6 @@ export default function Signup() {
             <div className="w-100 text-center mt-2">
                 Already have an account? <Link to="/login">Log in</Link>
             </div>
-        </>
+        </Container>
     )
 }

@@ -96,7 +96,7 @@ export default function Board() {
     }, [id])
 
     return (
-        <Container>
+        <Container className="columns-page">
             <h1 className="text-center">{board.title}</h1>
             <div className="w-100 text-center mt-2">
                 <Link to="/">Return to Board Selector</Link>
@@ -104,8 +104,8 @@ export default function Board() {
             <div className="columns">
                 {board.columns.map((column) => {
                     return (
-                        <Card key={column.id}>
-                            <Card.Header className="text-center">
+                        <Card key={column.id} className='board-column'>
+                            <Card.Header className="text-center" style={{ minHeight: '75px' }}>
                                 {column.title}
                                 <Button
                                     onClick={openEditColumnModal}
@@ -147,8 +147,10 @@ export default function Board() {
                         </Card>
                     )
                 })}
-                <Card>
-                    <Card.Header>Add a New Column</Card.Header>
+                <Card className='board-column'>
+                    <Card.Header className="text-center" style={{ minHeight: '75px' }}>
+                        Add a New Column
+                    </Card.Header>
                     <Card.Body>
                         <form onSubmit={addColumn}>
                             <Form.Group id="boardName">

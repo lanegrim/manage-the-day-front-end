@@ -105,7 +105,7 @@ export default function BoardSelect() {
     }, [])
 
     return (
-        <Container className='text-center'>
+        <Container className='text-center' style={{ maxWidth: "400px" }}>
             <h1>My Boards</h1>
             <Card>
                 <Card.Header>Select a Board</Card.Header>
