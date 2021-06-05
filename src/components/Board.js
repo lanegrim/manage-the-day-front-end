@@ -62,7 +62,8 @@ export default function Board() {
                 "https://managetheday-api.herokuapp.com/columns/" + currentItemID
             )
             .then((response) => {
-                getBoard(board.id);
+                getBoard(board.id)
+                closeEditColumnModal()
             });
     }
 
@@ -79,6 +80,7 @@ export default function Board() {
             .then((response) => {
                 getBoard(board.id)
                 setLoading(false)
+                event.target.reset()
             },
                 (err) => console.error(err)
             )
