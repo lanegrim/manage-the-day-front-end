@@ -46,12 +46,14 @@ export default function Board() {
     function openEditTodoModal(event) {
         setCurrentItemID(event.target.id)
         setCurrentItemName(event.target.name)
+        setCurrentTodoColumn_ID(event.target.parentNode.id)
         setShowEditTodoModal(true)
     }
 
     function closeEditTodoModal(event) {
         setCurrentItemID('')
         setCurrentItemName('')
+        setCurrentTodoColumn_ID('')
         setShowEditTodoModal(false)
     }
 
@@ -124,10 +126,11 @@ export default function Board() {
 
         const updatedTodo = {
             task: todoNameRef.current.value,
-            column_id: event.target.id,
+            column_id: currentTodoColumn_ID,
             completed: completionStatus
         }
 
+        console.log(updatedTodo)
         axios
             .put(
                 "https://managetheday-api.herokuapp.com/todos/" + currentItemID,
@@ -172,6 +175,14 @@ export default function Board() {
             .catch((error) => console.error(error))
     }
 
+    function isComplete(todo) {
+        if (todo.completed === true) {
+            return "COMPLETE"
+        } else {
+            return "INCOMPLETE"
+        }
+    }
+
     useEffect(() => {
         fetch(`http://localhost:5000/boards/${id}`)
             .then(
@@ -203,7 +214,7 @@ export default function Board() {
                                 <ListGroup variant='flush'>
                                     {column.todos.map((todo) => {
                                         return (
-                                            <ListGroupItem key={todo.id}>
+                                            <ListGroupItem key={todo.id} id={todo.column_id}>
                                                 {todo.task}
                                                 <Button
                                                     onClick={openEditTodoModal}
@@ -212,6 +223,7 @@ export default function Board() {
                                                 >
                                                     Edit
                                                 </Button>
+                                                {isComplete(todo)}
                                                 <Modal show={showEditTodoModal} onHide={closeEditTodoModal} centered>
                                                     <Modal.Header closeButton>
                                                         <Modal.Title>Edit "{currentItemName}"</Modal.Title>
