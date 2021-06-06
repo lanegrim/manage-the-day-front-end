@@ -10,11 +10,13 @@ export default function Board() {
     const [currentItemID, setCurrentItemID] = useState('')
     const [loading, setLoading] = useState(false)
     const [currentItemName, setCurrentItemName] = useState('')
+    const [currentTodoColumn_ID, setCurrentTodoColumn_ID] = useState('')
     const columnNameRef = useRef()
     const todoNameRef = useRef()
     const todoCompletedRef = useRef()
     const [showEditColumnModal, setShowEditColumnModal] = useState(false)
     const [showEditTodoModal, setShowEditTodoModal] = useState(false)
+    const [showNewTodoModal, setShowNewTodoModal] = useState(false)
 
     function getBoard(givenID) {
         axios
@@ -51,6 +53,16 @@ export default function Board() {
         setCurrentItemID('')
         setCurrentItemName('')
         setShowEditTodoModal(false)
+    }
+
+    function openNewTodoModal(event) {
+        setCurrentTodoColumn_ID(event.target.id)
+        setShowNewTodoModal(true)
+    }
+
+    function closeNewTodoModal(event) {
+        setCurrentTodoColumn_ID('')
+        setShowNewTodoModal(false)
     }
 
     function editColumn(event) {
@@ -111,8 +123,8 @@ export default function Board() {
         }
 
         const updatedTodo = {
-            column_id: event.target.id,
             task: todoNameRef.current.value,
+            column_id: event.target.id,
             completed: completionStatus
         }
 
@@ -129,11 +141,35 @@ export default function Board() {
     }
 
     function deleteTodo() {
-
+        axios
+            .delete(
+                "https://managetheday-api.herokuapp.com/todos/" + currentItemID
+            )
+            .then((response) => {
+                getBoard(board.id)
+                closeEditTodoModal()
+            });
     }
 
     function addTodo(event) {
+        event.preventDefault()
+        setLoading(true)
 
+        const newTodo = {
+            task: todoNameRef.current.value,
+            column_id: event.target.id,
+            completed: false
+        }
+
+        axios.post('https://managetheday-api.herokuapp.com/todos', newTodo)
+            .then((response) => {
+                getBoard(board.id)
+                setLoading(false)
+                closeNewTodoModal()
+            },
+                (err) => console.error(err)
+            )
+            .catch((error) => console.error(error))
     }
 
     useEffect(() => {
@@ -142,21 +178,6 @@ export default function Board() {
                 getBoard(id)
             )
     }, [id])
-
-    // function testEditTodo(event) {
-    //     event.preventDefault()
-
-    //     let completionStatus = false
-    //     if (todoCompletedRef.current.value === 'Completed') {
-    //         completionStatus = true
-    //     }
-
-    //     console.log(event.target)
-    //     console.log(event.target.id)
-    //     console.log(todoNameRef.current.value)
-    //     console.log(completionStatus)
-    // }
-
 
     return (
         <Container className="columns-page">
@@ -227,13 +248,38 @@ export default function Board() {
                                             </ListGroupItem>
                                         )
                                     })}
+                                    <ListGroupItem>
+                                        <Button
+                                            className="w-100 mt-2"
+                                            onClick={openNewTodoModal}
+                                            id={column.id}>
+                                            Add a New Task
+                                            </Button>
+                                    </ListGroupItem>
+                                    <Modal show={showNewTodoModal} onHide={closeNewTodoModal} centered>
+                                        <Modal.Header closeButton>Add a New Task</Modal.Header>
+                                        <Modal.Body>
+                                            <form onSubmit={addTodo} id={currentTodoColumn_ID}>
+                                                <Form.Group id="todoName">
+                                                    <Form.Control
+                                                        type="text"
+                                                        ref={todoNameRef}
+                                                        required
+                                                        placeholder='Name Your New Task' />
+                                                </Form.Group>
+                                                <Button className="w-100 mt-2" type="submit" variant='success' disabled={loading}>
+                                                    Create Task
+                                            </Button>
+                                            </form>
+                                        </Modal.Body>
+                                    </Modal>
                                     <Modal show={showEditColumnModal} onHide={closeEditColumnModal} centered>
                                         <Modal.Header closeButton>
                                             <Modal.Title>Edit "{currentItemName}"</Modal.Title>
                                         </Modal.Header>
                                         <Modal.Body>
-                                            <form onSubmit={editColumn}>
-                                                <Form.Group id="columnName">
+                                            <form onSubmit={editColumn} id="columnName">
+                                                <Form.Group>
                                                     <Form.Label>Column title</Form.Label>
                                                     <Form.Control
                                                         type="text"
