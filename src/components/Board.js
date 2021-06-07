@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Card, ListGroup, ListGroupItem, Button, Modal, Form, Container } from 'react-bootstrap'
 import { useParams, Link } from 'react-router-dom'
 import axios from 'axios'
+import Header from './Header'
 
 
 export default function Board() {
@@ -27,7 +28,7 @@ export default function Board() {
     const [showNewTodoModal, setShowNewTodoModal] = useState(false)
 
     //////////////////////////////////////////////////////////////////
-    // GET BOARD DATA FUNCTION
+    // GET DATA FUNCTION
     //////////////////////////////////////////////////////////////////
 
     function getBoard(givenID) {
@@ -37,10 +38,6 @@ export default function Board() {
                 (response) => {
                     setBoard(response.data.board)
                     setColumns(response.data.board.columns)
-                    setColumnOrder(response.data.board.columnOrder)
-                    console.log(response.data.board)
-                    console.log(response.data.board.columns)
-                    console.log(response.data.board.columnOrder)
                 },
                 (err) => console.error(err)
             )
@@ -95,7 +92,8 @@ export default function Board() {
         event.preventDefault();
         const updatedColumn = {
             board_id: board.id,
-            title: columnNameRef.current.value
+            title: columnNameRef.current.value,
+            todoOrder: []
         }
 
         axios
@@ -159,7 +157,6 @@ export default function Board() {
             completed: completionStatus
         }
 
-        console.log(updatedTodo)
         axios
             .put(
                 "https://managetheday-api.herokuapp.com/todos/" + currentItemID,
@@ -224,7 +221,8 @@ export default function Board() {
     }, [id])
 
     return (
-        <Container className="columns-page">
+        <div className="columns-page">
+            <Header />
             {
                 //////////////////////////////////
                 // BOARD SCREEN HEADER
@@ -407,6 +405,6 @@ export default function Board() {
                     </Card.Body>
                 </Card>
             </div>
-        </Container>
+        </div>
     )
 }
