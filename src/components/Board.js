@@ -12,6 +12,7 @@ export default function Board() {
     const [currentItemName, setCurrentItemName] = useState('')
     const [currentTodoColumn_ID, setCurrentTodoColumn_ID] = useState('')
     const columnNameRef = useRef()
+    const newColumnNameRef = useRef()
     const todoNameRef = useRef()
     const todoCompletedRef = useRef()
     const [showEditColumnModal, setShowEditColumnModal] = useState(false)
@@ -102,7 +103,7 @@ export default function Board() {
         setLoading(true)
 
         const newColumn = {
-            title: columnNameRef.current.value,
+            title: newColumnNameRef.current.value,
             board_id: board.id
         }
 
@@ -322,7 +323,7 @@ export default function Board() {
                             <Form.Group id="boardName">
                                 <Form.Control
                                     type="text"
-                                    ref={columnNameRef}
+                                    ref={newColumnNameRef}
                                     required
                                     placeholder='Name Your New Column' />
                             </Form.Group>

@@ -9,6 +9,7 @@ export default function BoardSelect() {
     const { currentUser, logout } = useAuth()
     const history = useHistory()
     const boardNameRef = useRef()
+    const newBoardNameRef = useRef()
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
     const [boards, setBoards] = useState([])
@@ -86,13 +87,14 @@ export default function BoardSelect() {
         event.preventDefault()
         setLoading(true)
         const newBoard = {
-            title: boardNameRef.current.value,
+            title: newBoardNameRef.current.value,
             owner: currentUser.email
         }
         axios.post('https://managetheday-api.herokuapp.com/boards', newBoard)
             .then((response) => {
                 getBoards()
                 setLoading(false)
+                event.target.reset()
             },
                 (err) => console.error(err)
             )
@@ -153,7 +155,7 @@ export default function BoardSelect() {
                                     <Form.Label>Or Add a New Board</Form.Label>
                                     <Form.Control
                                         type="text"
-                                        ref={boardNameRef}
+                                        ref={newBoardNameRef}
                                         required
                                         placeholder='Name Your New Board' />
                                 </Form.Group>
