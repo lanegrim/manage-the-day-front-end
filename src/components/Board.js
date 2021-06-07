@@ -2,11 +2,19 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Card, ListGroup, ListGroupItem, Button, Modal, Form, Container } from 'react-bootstrap'
 import { useParams, Link } from 'react-router-dom'
 import axios from 'axios'
+import Header from './Header'
 
 
 export default function Board() {
+
+    //////////////////////////////////////////////////////////////////
+    // VARIABLE / HOOK DECLARATIONS
+    //////////////////////////////////////////////////////////////////
+
     const { id } = useParams()
     const [board, setBoard] = useState({ columns: [], id: '' })
+    const [columns, setColumns] = useState([])
+    const [columnOrder, setColumnOrder] = useState([])
     const [currentItemID, setCurrentItemID] = useState('')
     const [loading, setLoading] = useState(false)
     const [currentItemName, setCurrentItemName] = useState('')
@@ -19,18 +27,26 @@ export default function Board() {
     const [showEditTodoModal, setShowEditTodoModal] = useState(false)
     const [showNewTodoModal, setShowNewTodoModal] = useState(false)
 
+    //////////////////////////////////////////////////////////////////
+    // GET DATA FUNCTION
+    //////////////////////////////////////////////////////////////////
+
     function getBoard(givenID) {
         axios
             .get(`https://managetheday-api.herokuapp.com/boards/${givenID}`)
             .then(
                 (response) => {
                     setBoard(response.data.board)
-                    console.log(response.data.board)
+                    setColumns(response.data.board.columns)
                 },
                 (err) => console.error(err)
             )
             .catch((error) => console.error(error));
     };
+
+    //////////////////////////////////////////////////////////////////
+    // OPEN / CLOSE MODALS FUNCTIONS
+    //////////////////////////////////////////////////////////////////
 
     function openEditColumnModal(event) {
         setCurrentItemID(event.target.id)
@@ -68,11 +84,16 @@ export default function Board() {
         setShowNewTodoModal(false)
     }
 
+    //////////////////////////////////////////////////////////////////
+    // COLUMN CRUD FUNCTIONS
+    //////////////////////////////////////////////////////////////////
+
     function editColumn(event) {
         event.preventDefault();
         const updatedColumn = {
             board_id: board.id,
-            title: columnNameRef.current.value
+            title: columnNameRef.current.value,
+            todoOrder: []
         }
 
         axios
@@ -104,7 +125,8 @@ export default function Board() {
 
         const newColumn = {
             title: newColumnNameRef.current.value,
-            board_id: board.id
+            board_id: board.id,
+            todoOrder: []
         }
 
         axios.post('https://managetheday-api.herokuapp.com/columns', newColumn)
@@ -117,6 +139,10 @@ export default function Board() {
             )
             .catch((error) => console.error(error))
     }
+
+    //////////////////////////////////////////////////////////////////
+    // TODO CRUD FUNCTIONS
+    //////////////////////////////////////////////////////////////////
 
     function editTodo(event) {
         event.preventDefault();
@@ -131,7 +157,6 @@ export default function Board() {
             completed: completionStatus
         }
 
-        console.log(updatedTodo)
         axios
             .put(
                 "https://managetheday-api.herokuapp.com/todos/" + currentItemID,
@@ -184,6 +209,10 @@ export default function Board() {
         }
     }
 
+    //////////////////////////////////////////////////////////////////
+    // LOAD BOARD DATA ON MOUNT
+    //////////////////////////////////////////////////////////////////
+
     useEffect(() => {
         fetch(`http://localhost:5000/boards/${id}`)
             .then(
@@ -192,15 +221,31 @@ export default function Board() {
     }, [id])
 
     return (
-        <Container className="columns-page">
+        <div className="columns-page">
+            <Header />
+            {
+                //////////////////////////////////
+                // BOARD SCREEN HEADER
+                //////////////////////////////////
+            }
             <h1 className="text-center">{board.title}</h1>
             <div className="w-100 text-center mt-2">
                 <Link to="/">Return to Board Selector</Link>
             </div>
+            {
+                //////////////////////////////////
+                // COLUMNS CONTAINER [HORIZONTAL LIST]
+                //////////////////////////////////
+            }
             <div className="columns">
-                {board.columns.map((column) => {
+                {columns.map((column) => {
                     return (
                         <Card key={column.id} className='board-column'>
+                            {
+                                //////////////////////////////////
+                                // COLUMN CARD
+                                //////////////////////////////////
+                            }
                             <Card.Header className="text-center" style={{ minHeight: '75px' }}>
                                 {column.title}
                                 <Button
@@ -212,6 +257,11 @@ export default function Board() {
                                 </Button>
                             </Card.Header>
                             <Card.Body>
+                                {
+                                    //////////////////////////////////
+                                    // TODO CARD
+                                    //////////////////////////////////
+                                }
                                 <ListGroup variant='flush'>
                                     {column.todos.map((todo) => {
                                         return (
@@ -225,7 +275,13 @@ export default function Board() {
                                                     Edit
                                                 </Button>
                                                 {isComplete(todo)}
+
                                                 <Modal show={showEditTodoModal} onHide={closeEditTodoModal} centered>
+                                                    {
+                                                        //////////////////////////////////
+                                                        // TODO EDIT MODAL
+                                                        //////////////////////////////////
+                                                    }
                                                     <Modal.Header closeButton>
                                                         <Modal.Title>Edit "{currentItemName}"</Modal.Title>
                                                     </Modal.Header>
@@ -270,6 +326,11 @@ export default function Board() {
                                             </Button>
                                     </ListGroupItem>
                                     <Modal show={showNewTodoModal} onHide={closeNewTodoModal} centered>
+                                        {
+                                            //////////////////////////////////
+                                            // TODO CREATE MODAL
+                                            //////////////////////////////////
+                                        }
                                         <Modal.Header closeButton>Add a New Task</Modal.Header>
                                         <Modal.Body>
                                             <form onSubmit={addTodo} id={currentTodoColumn_ID}>
@@ -287,6 +348,11 @@ export default function Board() {
                                         </Modal.Body>
                                     </Modal>
                                     <Modal show={showEditColumnModal} onHide={closeEditColumnModal} centered>
+                                        {
+                                            //////////////////////////////////
+                                            // COLUMN EDIT MODAL
+                                            //////////////////////////////////
+                                        }
                                         <Modal.Header closeButton>
                                             <Modal.Title>Edit "{currentItemName}"</Modal.Title>
                                         </Modal.Header>
@@ -315,6 +381,11 @@ export default function Board() {
                     )
                 })}
                 <Card className='board-column'>
+                    {
+                        //////////////////////////////////
+                        // COLUMN CREATE CARD
+                        //////////////////////////////////
+                    }
                     <Card.Header className="text-center" style={{ minHeight: '75px' }}>
                         Add a New Column
                     </Card.Header>
@@ -334,6 +405,6 @@ export default function Board() {
                     </Card.Body>
                 </Card>
             </div>
-        </Container>
+        </div>
     )
 }
