@@ -4,6 +4,7 @@ import axios from "axios";
 import { useHistory } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import Header from './Header'
+import TitleCard from './TitleCard';
 
 export default function BoardSelect() {
 
@@ -114,6 +115,7 @@ export default function BoardSelect() {
     return (
         <>
             <Header />
+            <TitleCard />
             <Container className='text-center' style={{ maxWidth: "400px" }}>
                 <h1>My Boards</h1>
                 <Card>

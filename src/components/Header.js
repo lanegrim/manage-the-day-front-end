@@ -22,14 +22,19 @@ export default function Header() {
 
     return (
         <Nav variant="pills">
+            <Nav.Item disabled={loading} >
+                <Nav.Link active href='/dashboard'>
+                    My Profile
+                </Nav.Link>
+            </Nav.Item>
             <Nav.Item onClick={handleLogout} disabled={loading} >
                 <Nav.Link active>
                     Log Out {error && <Alert variant="danger">{error}</Alert>}
                 </Nav.Link>
             </Nav.Item>
             <Nav.Item disabled={loading} >
-                <Nav.Link active href='/dashboard'>
-                    My Profile
+                <Nav.Link active href='/'>
+                    Home
                 </Nav.Link>
             </Nav.Item>
         </Nav>
