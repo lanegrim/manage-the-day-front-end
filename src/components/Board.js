@@ -223,15 +223,7 @@ export default function Board() {
     return (
         <div className="columns-page">
             <Header />
-            {
-                //////////////////////////////////
-                // BOARD SCREEN HEADER
-                //////////////////////////////////
-            }
             <h1 className="text-center">{board.title}</h1>
-            <div className="w-100 text-center mt-2">
-                <Link to="/">Return to Board Selector</Link>
-            </div>
             {
                 //////////////////////////////////
                 // COLUMNS CONTAINER [HORIZONTAL LIST]

@@ -6,6 +6,7 @@ import { Form, Card, Button, Alert, Container } from 'react-bootstrap'
 import { useAuth } from '../contexts/AuthContext'
 import { Link } from 'react-router-dom'
 import Header from './Header'
+import TitleCard from './TitleCard'
 
 export default function ForgotPassword() {
     const emailRef = useRef()
@@ -31,7 +32,7 @@ export default function ForgotPassword() {
 
     return (
         <Container style={{ maxWidth: "400px" }}>
-            <Header />
+            <TitleCard />
             <Card>
                 <Card.Body>
                     <h2 className="text-center mb-4">

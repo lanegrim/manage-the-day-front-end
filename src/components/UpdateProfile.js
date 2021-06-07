@@ -6,6 +6,7 @@ import { Form, Card, Button, Alert } from 'react-bootstrap'
 import { useAuth } from '../contexts/AuthContext'
 import { Link, useHistory } from 'react-router-dom'
 import Header from './Header'
+import TitleCard from './TitleCard'
 
 export default function UpdateProfile() {
     const emailRef = useRef()
@@ -46,6 +47,7 @@ export default function UpdateProfile() {
     return (
         <>
             <Header />
+            <TitleCard />
             <Card>
                 <Card.Body>
                     <h2 className="text-center mb-4">

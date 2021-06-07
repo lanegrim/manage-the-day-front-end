@@ -5,6 +5,7 @@ import React, { useRef, useState } from 'react'
 import { Form, Card, Button, Alert, Container } from 'react-bootstrap'
 import { useAuth } from '../contexts/AuthContext'
 import { Link, useHistory } from 'react-router-dom'
+import TitleCard from './TitleCard'
 
 export default function Signup() {
     const emailRef = useRef()
@@ -35,6 +36,7 @@ export default function Signup() {
 
     return (
         <Container style={{ maxWidth: "400px" }}>
+            <TitleCard />
             <Card>
                 <Card.Body>
                     <h2 className="text-center mb-4">
