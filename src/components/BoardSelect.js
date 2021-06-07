@@ -15,6 +15,7 @@ export default function BoardSelect() {
     const [boards, setBoards] = useState([])
     const [boardID, setBoardID] = useState('')
     const [boardName, setBoardName] = useState('')
+    const [boardColumnOrder, setBoardColumnOrder] = useState([])
     const [showEditModal, setShowEditModal] = useState(false)
 
 
@@ -35,6 +36,7 @@ export default function BoardSelect() {
             .then(
                 (response) => {
                     setBoards(response.data.boards)
+                    console.log(response.data.boards)
                 },
                 (err) => console.error(err)
             )
@@ -45,19 +47,33 @@ export default function BoardSelect() {
         setBoardID(event.target.id)
         setBoardName(event.target.name)
         setShowEditModal(true)
+        setBoardColumnOrder(boards)
     }
 
     function closeEditModal(event) {
         setBoardID('')
         setBoardName('')
         setShowEditModal(false)
+        setBoardColumnOrder([])
     }
 
     function editBoard(event) {
         event.preventDefault();
+
+        const findCurrentBoard = (event) => {
+            for (let board of boards) {
+                if (board.id == boardID) {
+                    return board
+                }
+            }
+        }
+
+        let currentBoard = findCurrentBoard()
+
         const updatedBoard = {
             owner: currentUser.email,
-            title: boardNameRef.current.value
+            title: boardNameRef.current.value,
+            columnOrder: currentBoard.columnOrder
         }
 
         axios
@@ -88,7 +104,8 @@ export default function BoardSelect() {
         setLoading(true)
         const newBoard = {
             title: newBoardNameRef.current.value,
-            owner: currentUser.email
+            owner: currentUser.email,
+            columnOrder: []
         }
         axios.post('https://managetheday-api.herokuapp.com/boards', newBoard)
             .then((response) => {
