@@ -40,7 +40,7 @@ export default function Board() {
     // GET DATA FUNCTION
     //////////////////////////////////////////////////////////////////
 
-    function getBoard(givenID) {
+    const getBoard = (givenID) => {
         axios
             .get(`https://managetheday-api.herokuapp.com/boards/${givenID}`)
             .then(
@@ -70,49 +70,49 @@ export default function Board() {
     // OPEN / CLOSE MODALS FUNCTIONS
     //////////////////////////////////////////////////////////////////
 
-    function openEditColumnModal(event) {
-        setCurrentItemID(event.target.id)
-        setCurrentItemName(event.target.name)
+    const openEditColumnModal = (event) => {
+        setCurrentItemID(event.currentTarget.id)
+        setCurrentItemName(event.currentTarget.name)
         setShowEditColumnModal(true)
     }
 
-    function closeEditColumnModal(event) {
+    const closeEditColumnModal = (event) => {
         setCurrentItemID('')
         setCurrentItemName('')
         setShowEditColumnModal(false)
     }
 
-    function openEditTodoModal(event) {
-        setCurrentItemID(event.target.id)
-        setCurrentItemName(event.target.name)
-        setCurrentTodoColumn_ID(event.target.parentNode.id)
+    const openEditTodoModal = (event) => {
+        setCurrentItemID(event.currentTarget.id)
+        setCurrentItemName(event.currentTarget.name)
+        setCurrentTodoColumn_ID(event.currentTarget.parentNode.id)
         setShowEditTodoModal(true)
     }
 
-    function closeEditTodoModal(event) {
+    const closeEditTodoModal = (event) => {
         setCurrentItemID('')
         setCurrentItemName('')
         setCurrentTodoColumn_ID('')
         setShowEditTodoModal(false)
     }
 
-    function openNewTodoModal(event) {
+    const openNewTodoModal = (event) => {
         setCurrentTodoColumn_ID(event.target.id)
         setShowNewTodoModal(true)
     }
 
-    function closeNewTodoModal(event) {
+    const closeNewTodoModal = (event) => {
         setCurrentTodoColumn_ID('')
         setShowNewTodoModal(false)
     }
 
-    function openCollaboratorsModal(event) {
+    const openCollaboratorsModal = (event) => {
         if (currentUser.email === boardOwner) {
             setShowCollaboratorsModal(true)
         }
     }
 
-    function closeCollaboratorsModal(event) {
+    const closeCollaboratorsModal = (event) => {
         setShowCollaboratorsModal(false)
     }
 
@@ -120,7 +120,7 @@ export default function Board() {
     // COLUMN CRUD FUNCTIONS
     //////////////////////////////////////////////////////////////////
 
-    function editColumn(event) {
+    const editColumn = (event) => {
         event.preventDefault();
         const updatedColumn = {
             board_id: board.id,
@@ -140,7 +140,7 @@ export default function Board() {
             .catch((error) => console.error(error));
     }
 
-    function deleteColumn() {
+    const deleteColumn = () => {
         axios
             .delete(
                 "https://managetheday-api.herokuapp.com/columns/" + currentItemID
@@ -151,7 +151,7 @@ export default function Board() {
             });
     }
 
-    function addColumn(event) {
+    const addColumn = (event) => {
         event.preventDefault()
         setLoading(true)
 
@@ -176,7 +176,7 @@ export default function Board() {
     // TODO CRUD FUNCTIONS
     //////////////////////////////////////////////////////////////////
 
-    function editTodo(event) {
+    const editTodo = (event) => {
         event.preventDefault();
         let completionStatus = false
         if (todoCompletedRef.current.value === 'Completed') {
@@ -201,7 +201,7 @@ export default function Board() {
             .catch((error) => console.error(error));
     }
 
-    function deleteTodo() {
+    const deleteTodo = () => {
         axios
             .delete(
                 "https://managetheday-api.herokuapp.com/todos/" + currentItemID
@@ -212,7 +212,7 @@ export default function Board() {
             });
     }
 
-    function addTodo(event) {
+    const addTodo = (event) => {
         event.preventDefault()
         setLoading(true)
 
@@ -233,18 +233,24 @@ export default function Board() {
             .catch((error) => console.error(error))
     }
 
-    function isComplete(todo) {
+    const isComplete = (todo) => {
         if (todo.completed === true) {
-            return "COMPLETE"
+            return <img alt='Checked' src='/outline_check_box_black_24dp.png' className='checkmark'></img>
         } else {
-            return "INCOMPLETE"
+            return <img alt='Unchecked' src='/outline_check_box_outline_blank_black_24dp.png' className='checkmark'></img>
         }
     }
+
+    // const completionRule = (todo) => {
+    //     if (todo.completed === true) {
+    //         return
+    //     }
+    // }
 
     //////////////////////////////////////////////////////////////////
     // ADD AND REMOVE COLLABORATORS
     //////////////////////////////////////////////////////////////////
-    function editBoard(event) {
+    const editBoard = (event) => {
         event.preventDefault()
 
 
@@ -308,12 +314,12 @@ export default function Board() {
                             }
                             <Card.Header className="text-center" style={{ minHeight: '75px' }}>
                                 {column.title}
-                                <Button
+                                <Button className="edit-btn"
                                     onClick={openEditColumnModal}
                                     id={column.id}
                                     name={column.title}
                                 >
-                                    Edit
+                                    <img alt='Edit' src='/outline_edit_note_white_24dp.png' className='edit-img'></img>
                                 </Button>
                             </Card.Header>
                             <Card.Body>
@@ -326,15 +332,17 @@ export default function Board() {
                                     {column.todos.map((todo) => {
                                         return (
                                             <ListGroupItem key={todo.id} id={todo.column_id}>
+                                                {/* {completionRule(todo)} */}
+                                                {isComplete(todo)}
                                                 {todo.task}
-                                                <Button
+                                                <Button className="edit-btn"
                                                     onClick={openEditTodoModal}
                                                     id={todo.id}
                                                     name={todo.task}
                                                 >
-                                                    Edit
+                                                    <img alt='Edit'
+                                                        src='/outline_edit_note_white_24dp.png' className='edit-img'></img>
                                                 </Button>
-                                                {isComplete(todo)}
 
                                                 <Modal show={showEditTodoModal} onHide={closeEditTodoModal} centered>
                                                     {
