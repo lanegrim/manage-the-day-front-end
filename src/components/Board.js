@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { Card, ListGroup, ListGroupItem, Button, Modal, Form, Container } from 'react-bootstrap'
-import { useParams, Link } from 'react-router-dom'
+import { Card, ListGroup, ListGroupItem, Button, Modal, Form } from 'react-bootstrap'
+import { useParams } from 'react-router-dom'
 import axios from 'axios'
 import Header from './Header'
+import { useAuth } from '../contexts/AuthContext'
 
 
 export default function Board() {
@@ -11,10 +12,12 @@ export default function Board() {
     // VARIABLE / HOOK DECLARATIONS
     //////////////////////////////////////////////////////////////////
 
+    const { currentUser } = useAuth()
     const { id } = useParams()
     const [board, setBoard] = useState({ columns: [], id: '' })
     const [columns, setColumns] = useState([])
-    const [columnOrder, setColumnOrder] = useState([])
+    const [collaborators, setCollaborators] = useState([''])
+    // const [columnOrder, setColumnOrder] = useState([])
     const [currentItemID, setCurrentItemID] = useState('')
     const [loading, setLoading] = useState(false)
     const [currentItemName, setCurrentItemName] = useState('')
@@ -23,9 +26,14 @@ export default function Board() {
     const newColumnNameRef = useRef()
     const todoNameRef = useRef()
     const todoCompletedRef = useRef()
+    const collaboratorOneRef = useRef()
+    const collaboratorTwoRef = useRef()
+    const collaboratorThreeRef = useRef()
+    const collaboratorFourRef = useRef()
     const [showEditColumnModal, setShowEditColumnModal] = useState(false)
     const [showEditTodoModal, setShowEditTodoModal] = useState(false)
     const [showNewTodoModal, setShowNewTodoModal] = useState(false)
+    const [showCollaboratorsModal, setShowCollaboratorsModal] = useState(false)
 
     //////////////////////////////////////////////////////////////////
     // GET DATA FUNCTION
@@ -38,6 +46,7 @@ export default function Board() {
                 (response) => {
                     setBoard(response.data.board)
                     setColumns(response.data.board.columns)
+                    setCollaborators(response.data.board.collaborators, console.log(collaborators))
                 },
                 (err) => console.error(err)
             )
@@ -82,6 +91,14 @@ export default function Board() {
     function closeNewTodoModal(event) {
         setCurrentTodoColumn_ID('')
         setShowNewTodoModal(false)
+    }
+
+    function openCollaboratorsModal(event) {
+        setShowCollaboratorsModal(true)
+    }
+
+    function closeCollaboratorsModal(event) {
+        setShowCollaboratorsModal(false)
     }
 
     //////////////////////////////////////////////////////////////////
@@ -210,6 +227,44 @@ export default function Board() {
     }
 
     //////////////////////////////////////////////////////////////////
+    // ADD AND REMOVE COLLABORATORS
+    //////////////////////////////////////////////////////////////////
+    function editBoard(event) {
+        event.preventDefault()
+
+
+        const collaboratorArray = [
+            collaboratorOneRef.current.value,
+            collaboratorTwoRef.current.value,
+            collaboratorThreeRef.current.value,
+            collaboratorFourRef.current.value
+        ]
+
+
+        const updatedBoard = {
+            owner: currentUser.email,
+            title: board.title,
+            columnOrder: board.columnOrder,
+            collaborators: collaboratorArray
+        }
+
+        console.log(updatedBoard)
+
+        axios
+            .put(
+                "https://managetheday-api.herokuapp.com/boards/" + board.id,
+                updatedBoard
+            )
+            .then((response) => {
+                closeCollaboratorsModal()
+                getBoard(board.id)
+            })
+            .catch((error) => console.error(error));
+    }
+
+
+
+    //////////////////////////////////////////////////////////////////
     // LOAD BOARD DATA ON MOUNT
     //////////////////////////////////////////////////////////////////
 
@@ -219,6 +274,10 @@ export default function Board() {
                 getBoard(id)
             )
     }, [id])
+
+    //////////////////////////////////////////////////////////////////
+    // RENDER
+    //////////////////////////////////////////////////////////////////
 
     return (
         <div className="columns-page">
@@ -396,6 +455,55 @@ export default function Board() {
                         </form>
                     </Card.Body>
                 </Card>
+            </div>
+            <div>
+                <Button onClick={openCollaboratorsModal}>Add Collaborators</Button>
+                <Modal show={showCollaboratorsModal} onHide={closeCollaboratorsModal} centered>
+                    {
+                        //////////////////////////////////
+                        // COLLABORATORS MODAL
+                        //////////////////////////////////
+                    }
+                    <Modal.Header closeButton>
+                        <Modal.Title>Collaborators for {board.title}</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <p>Boards can have up to four collaborators in addition to the owner.</p>
+                        <form onSubmit={editBoard}>
+                            <Form.Group>
+                                <Form.Label>Collaborator 1</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    ref={collaboratorOneRef}
+                                    defaultValue={collaborators[0][0]} />
+                            </Form.Group>
+                            <Form.Group>
+                                <Form.Label>Collaborator 2</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    ref={collaboratorTwoRef}
+                                    defaultValue={collaborators[0][1]} />
+                            </Form.Group>
+                            <Form.Group>
+                                <Form.Label>Collaborator 3</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    ref={collaboratorThreeRef}
+                                    defaultValue={collaborators[0][2]} />
+                            </Form.Group>
+                            <Form.Group>
+                                <Form.Label>Collaborator 4</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    ref={collaboratorFourRef}
+                                    defaultValue={collaborators[0][3]} />
+                            </Form.Group>
+                            <Button className="w-100 mt-2" type="submit" variant='success'>
+                                Update Collaborators
+                            </Button>
+                        </form>
+                    </Modal.Body>
+                </Modal>
             </div>
         </div>
     )

@@ -8,7 +8,7 @@ import TitleCard from './TitleCard';
 
 export default function BoardSelect() {
 
-    const { currentUser, logout } = useAuth()
+    const { currentUser } = useAuth()
     const history = useHistory()
     const boardNameRef = useRef()
     const newBoardNameRef = useRef()
@@ -62,7 +62,8 @@ export default function BoardSelect() {
         const updatedBoard = {
             owner: currentUser.email,
             title: boardNameRef.current.value,
-            columnOrder: currentBoard.columnOrder
+            columnOrder: currentBoard.columnOrder,
+            collaborators: currentBoard.collaborators
         }
 
         axios
@@ -94,7 +95,8 @@ export default function BoardSelect() {
         const newBoard = {
             title: newBoardNameRef.current.value,
             owner: currentUser.email,
-            columnOrder: []
+            columnOrder: [],
+            collaborators: []
         }
         axios.post('https://managetheday-api.herokuapp.com/boards', newBoard)
             .then((response) => {
