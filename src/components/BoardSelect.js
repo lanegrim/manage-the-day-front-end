@@ -33,8 +33,8 @@ export default function BoardSelect() {
     };
 
     function openEditModal(event) {
-        setBoardID(event.target.id)
-        setBoardName(event.target.name)
+        setBoardID(event.currentTarget.id)
+        setBoardName(event.currentTarget.name)
         setShowEditModal(true)
         setBoardColumnOrder(boards)
     }
@@ -96,7 +96,7 @@ export default function BoardSelect() {
             title: newBoardNameRef.current.value,
             owner: currentUser.email,
             columnOrder: [],
-            collaborators: []
+            collaborators: ['', '', '', '']
         }
         axios.post('https://managetheday-api.herokuapp.com/boards', newBoard)
             .then((response) => {
@@ -125,15 +125,20 @@ export default function BoardSelect() {
                     <Card.Body>
                         <ListGroup variant='flush'>
                             {boards.map((board) => {
+                                console.log(board)
                                 if (board.owner === currentUser.email) {
                                     return <ListGroupItem key={board.id}>
                                         <Button onClick={() => { history.push(`/boards/${board.id}`) }}>
                                             <strong>{board.title}</strong>
+                                            <p>Created by you</p>
                                         </Button>
                                         <Button
                                             onClick={openEditModal}
                                             id={board.id}
-                                            name={board.title}> Edit </Button>
+                                            name={board.title}>
+                                            <img alt='Edit'
+                                                src='/outline_edit_note_white_24dp.png' className='edit-img'></img>
+                                        </Button>
                                         <Modal show={showEditModal} onHide={closeEditModal} centered>
                                             <Modal.Header closeButton>
                                                 <Modal.Title>Edit "{boardName}"</Modal.Title>
@@ -157,6 +162,14 @@ export default function BoardSelect() {
                                                 </Button>
                                             </Modal.Body>
                                         </Modal>
+                                    </ListGroupItem>
+                                }
+                                if (board.collaborators[0].indexOf(currentUser.email) !== -1) {
+                                    return <ListGroupItem key={board.id}>
+                                        <Button onClick={() => { history.push(`/boards/${board.id}`) }}>
+                                            <strong>{board.title}</strong>
+                                            <p>Created by {board.owner}</p>
+                                        </Button>
                                     </ListGroupItem>
                                 }
                             })}

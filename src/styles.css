@@ -17,3 +17,19 @@
     margin: 0;
     width: 100%;
 }
+
+.checkmark {
+    width: 2em;
+    margin-right: 1em;
+}
+
+.edit-img {
+    width: 1.5em;
+}
+
+.edit-btn {
+    display: inline-flex;
+    justify-content: center;
+    width: min-content;
+    margin-left: 1em;
+}

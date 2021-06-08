@@ -37,6 +37,9 @@ export default function Header() {
                     Home
                 </Nav.Link>
             </Nav.Item>
+            <Nav.Item>
+                Logged in as {currentUser.email}
+            </Nav.Item>
         </Nav>
     )
 }
