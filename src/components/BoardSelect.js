@@ -33,8 +33,8 @@ export default function BoardSelect() {
     };
 
     function openEditModal(event) {
-        setBoardID(event.target.id)
-        setBoardName(event.target.name)
+        setBoardID(event.currentTarget.id)
+        setBoardName(event.currentTarget.name)
         setShowEditModal(true)
         setBoardColumnOrder(boards)
     }
@@ -135,7 +135,10 @@ export default function BoardSelect() {
                                         <Button
                                             onClick={openEditModal}
                                             id={board.id}
-                                            name={board.title}> Edit </Button>
+                                            name={board.title}>
+                                            <img alt='Edit'
+                                                src='/outline_edit_note_white_24dp.png' className='edit-img'></img>
+                                        </Button>
                                         <Modal show={showEditModal} onHide={closeEditModal} centered>
                                             <Modal.Header closeButton>
                                                 <Modal.Title>Edit "{boardName}"</Modal.Title>
