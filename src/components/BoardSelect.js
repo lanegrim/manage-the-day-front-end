@@ -96,7 +96,7 @@ export default function BoardSelect() {
             title: newBoardNameRef.current.value,
             owner: currentUser.email,
             columnOrder: [],
-            collaborators: []
+            collaborators: ['', '', '', '']
         }
         axios.post('https://managetheday-api.herokuapp.com/boards', newBoard)
             .then((response) => {
@@ -125,6 +125,7 @@ export default function BoardSelect() {
                     <Card.Body>
                         <ListGroup variant='flush'>
                             {boards.map((board) => {
+                                console.log(board)
                                 if (board.owner === currentUser.email) {
                                     return <ListGroupItem key={board.id}>
                                         <Button onClick={() => { history.push(`/boards/${board.id}`) }}>
@@ -157,6 +158,13 @@ export default function BoardSelect() {
                                                 </Button>
                                             </Modal.Body>
                                         </Modal>
+                                    </ListGroupItem>
+                                }
+                                if (board.collaborators[0].indexOf(currentUser.email) !== -1) {
+                                    return <ListGroupItem key={board.id}>
+                                        <Button onClick={() => { history.push(`/boards/${board.id}`) }}>
+                                            <strong>{board.title}</strong>
+                                        </Button>
                                     </ListGroupItem>
                                 }
                             })}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { Card, ListGroup, ListGroupItem, Button, Modal, Form } from 'react-bootstrap'
+import { Card, ListGroup, ListGroupItem, Button, Modal, Form, OverlayTrigger, Tooltip } from 'react-bootstrap'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
 import Header from './Header'
@@ -16,7 +16,8 @@ export default function Board() {
     const { id } = useParams()
     const [board, setBoard] = useState({ columns: [], id: '' })
     const [columns, setColumns] = useState([])
-    const [collaborators, setCollaborators] = useState([''])
+    const [collaborators, setCollaborators] = useState(['', '', '', ''])
+    const [boardOwner, setBoardOwner] = useState('')
     // const [columnOrder, setColumnOrder] = useState([])
     const [currentItemID, setCurrentItemID] = useState('')
     const [loading, setLoading] = useState(false)
@@ -30,6 +31,7 @@ export default function Board() {
     const collaboratorTwoRef = useRef()
     const collaboratorThreeRef = useRef()
     const collaboratorFourRef = useRef()
+    const collaboratorsButtonRef = useRef()
     const [showEditColumnModal, setShowEditColumnModal] = useState(false)
     const [showEditTodoModal, setShowEditTodoModal] = useState(false)
     const [showNewTodoModal, setShowNewTodoModal] = useState(false)
@@ -46,7 +48,8 @@ export default function Board() {
                 (response) => {
                     setBoard(response.data.board)
                     setColumns(response.data.board.columns)
-                    setCollaborators(response.data.board.collaborators, console.log(collaborators))
+                    setCollaborators(response.data.board.collaborators)
+                    setBoardOwner(response.data.board.owner)
                 },
                 (err) => console.error(err)
             )
@@ -94,7 +97,9 @@ export default function Board() {
     }
 
     function openCollaboratorsModal(event) {
-        setShowCollaboratorsModal(true)
+        if (currentUser.email === boardOwner) {
+            setShowCollaboratorsModal(true)
+        }
     }
 
     function closeCollaboratorsModal(event) {
@@ -242,7 +247,7 @@ export default function Board() {
 
 
         const updatedBoard = {
-            owner: currentUser.email,
+            owner: boardOwner,
             title: board.title,
             columnOrder: board.columnOrder,
             collaborators: collaboratorArray
@@ -457,7 +462,17 @@ export default function Board() {
                 </Card>
             </div>
             <div>
-                <Button onClick={openCollaboratorsModal}>Add Collaborators</Button>
+
+                <OverlayTrigger
+                    placement='right'
+                    overlay={
+                        <Tooltip id={`tooltip-right`}>
+                            Only the board owner, {board.owner}, can add and remove collaborators.
+                        </Tooltip>
+                    }
+                >
+                    <Button onClick={openCollaboratorsModal} ref={collaboratorsButtonRef}>Add Collaborators</Button>
+                </OverlayTrigger>
                 <Modal show={showCollaboratorsModal} onHide={closeCollaboratorsModal} centered>
                     {
                         //////////////////////////////////
