@@ -130,6 +130,7 @@ export default function BoardSelect() {
                                     return <ListGroupItem key={board.id}>
                                         <Button onClick={() => { history.push(`/boards/${board.id}`) }}>
                                             <strong>{board.title}</strong>
+                                            <p>Created by you</p>
                                         </Button>
                                         <Button
                                             onClick={openEditModal}
@@ -164,6 +165,7 @@ export default function BoardSelect() {
                                     return <ListGroupItem key={board.id}>
                                         <Button onClick={() => { history.push(`/boards/${board.id}`) }}>
                                             <strong>{board.title}</strong>
+                                            <p>Created by {board.owner}</p>
                                         </Button>
                                     </ListGroupItem>
                                 }

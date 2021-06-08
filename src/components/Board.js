@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { Card, ListGroup, ListGroupItem, Button, Modal, Form, OverlayTrigger, Tooltip } from 'react-bootstrap'
+import { Card, ListGroup, ListGroupItem, Button, Modal, Form } from 'react-bootstrap'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
 import Header from './Header'
 import { useAuth } from '../contexts/AuthContext'
-
 
 export default function Board() {
 
@@ -55,6 +54,17 @@ export default function Board() {
             )
             .catch((error) => console.error(error));
     };
+
+    //////////////////////////////////////////////////////////////////
+    // LOAD BOARD DATA ON MOUNT
+    //////////////////////////////////////////////////////////////////
+
+    useEffect(() => {
+        fetch(`http://localhost:5000/boards/${id}`)
+            .then(
+                getBoard(id)
+            )
+    }, [id])
 
     //////////////////////////////////////////////////////////////////
     // OPEN / CLOSE MODALS FUNCTIONS
@@ -267,18 +277,11 @@ export default function Board() {
             .catch((error) => console.error(error));
     }
 
-
-
-    //////////////////////////////////////////////////////////////////
-    // LOAD BOARD DATA ON MOUNT
-    //////////////////////////////////////////////////////////////////
-
-    useEffect(() => {
-        fetch(`http://localhost:5000/boards/${id}`)
-            .then(
-                getBoard(id)
-            )
-    }, [id])
+    if (currentUser.email === boardOwner) {
+        var CollaboratorsButton = (
+            <Button onClick={openCollaboratorsModal} ref={collaboratorsButtonRef}>Add Collaborators</Button>
+        )
+    }
 
     //////////////////////////////////////////////////////////////////
     // RENDER
@@ -288,6 +291,7 @@ export default function Board() {
         <div className="columns-page">
             <Header />
             <h1 className="text-center">{board.title}</h1>
+            <h4 className="text-center">Owned by: {boardOwner}</h4>
             {
                 //////////////////////////////////
                 // COLUMNS CONTAINER [HORIZONTAL LIST]
@@ -462,17 +466,7 @@ export default function Board() {
                 </Card>
             </div>
             <div>
-
-                <OverlayTrigger
-                    placement='right'
-                    overlay={
-                        <Tooltip id={`tooltip-right`}>
-                            Only the board owner, {board.owner}, can add and remove collaborators.
-                        </Tooltip>
-                    }
-                >
-                    <Button onClick={openCollaboratorsModal} ref={collaboratorsButtonRef}>Add Collaborators</Button>
-                </OverlayTrigger>
+                {CollaboratorsButton}
                 <Modal show={showCollaboratorsModal} onHide={closeCollaboratorsModal} centered>
                     {
                         //////////////////////////////////
