@@ -50,16 +50,17 @@ export default function Board() {
                     setColumns(response.data.board.columns)
                     setCollaborators(response.data.board.collaborators)
                     setBoardOwner(response.data.board.owner)
-                    setColumnOrder(response.data.board.columnOrder)
 
-                    if (response.data.board.columns.length > response.data.board.columnOrder.length) {
+                    if (response.data.board.columns.length !== response.data.board.columnOrder.length) {
                         let newColumnOrder = []
                         response.data.board.columns.map((column) => {
                             newColumnOrder.push(column.id)
                             console.log(newColumnOrder)
                         })
                         setColumnOrder(newColumnOrder)
-                        updateColumnOrder()
+                        tempColumnOrder = (newColumnOrder)
+                    } else {
+                        setColumnOrder(response.data.board.columnOrder)
                     }
                 },
                 (err) => console.error(err)
@@ -122,7 +123,7 @@ export default function Board() {
     // UPDATE COLUMN ORDER IN DB ON SAVE
     //////////////////////////////////////////////////////////////////
 
-    const updateColumnOrder = () => {
+    const updateColumnOrder = async () => {
         let updatedBoard = {
             owner: boardOwner,
             title: board.title,
@@ -138,6 +139,7 @@ export default function Board() {
                 updatedBoard
             )
             .then((response) => {
+                getBoard(board.id)
             })
             .catch((error) => console.error(error))
     }
@@ -171,13 +173,23 @@ export default function Board() {
     }
 
     const deleteColumn = () => {
+        setLoading(true)
+        let updatedColumnOrder = columnOrder
+        console.log(updatedColumnOrder.indexOf(currentItemID))
+        updatedColumnOrder.splice(updatedColumnOrder.indexOf(currentItemID), 1)
+        console.log(updatedColumnOrder)
+        setColumnOrder(updatedColumnOrder)
+        console.log(columnOrder)
+        updateColumnOrder()
+
         axios
             .delete(
                 "https://managetheday-api.herokuapp.com/columns/" + currentItemID
             )
             .then((response) => {
-                getBoard(board.id)
                 closeEditColumnModal()
+                getBoard(board.id)
+                setLoading(false)
             });
     }
 
@@ -343,7 +355,9 @@ export default function Board() {
             }
             <div className="columns">
                 {columnOrder.map((columnID) => {
-                    console.log(tempColumnOrder)
+                    if (columnOrder.indexOf(columnID) === 0) {
+                        tempColumnOrder = []
+                    }
                     console.log(columns)
                     console.log(columnID)
                     let columnArray = columns.filter((obj) => {
@@ -352,7 +366,7 @@ export default function Board() {
                     console.log(columnArray)
                     let column = columnArray[0]
                     console.log(column)
-                    // tempColumnOrder = [...tempColumnOrder, column.id]
+                    tempColumnOrder = [...tempColumnOrder, column.id]
                     console.log(tempColumnOrder)
                     return (
                         <Card key={columnID} className='board-column'>

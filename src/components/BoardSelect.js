@@ -20,6 +20,7 @@ export default function BoardSelect() {
     const [showEditModal, setShowEditModal] = useState(false)
 
     function getBoards() {
+        console.log('loading boards')
         axios
             .get("https://managetheday-api.herokuapp.com/boards")
             .then(
@@ -182,7 +183,7 @@ export default function BoardSelect() {
                                             required
                                             placeholder='Name Your New Board' />
                                     </Form.Group>
-                                    <Button className="w-100 mt-2" type="submit" variant='success'>
+                                    <Button className="w-100 mt-2" type="submit" variant='success' disabled={loading}>
                                         Create Board
                                 </Button>
                                 </form>
