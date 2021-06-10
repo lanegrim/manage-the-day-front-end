@@ -2,7 +2,7 @@
 // THIS TUTORIAL CAN BE FOUND AT https://www.youtube.com/watch?v=PKwu15ldZ7k
 
 import React, { useRef, useState } from 'react'
-import { Form, Card, Button, Alert } from 'react-bootstrap'
+import { Form, Card, Button, Alert, Container } from 'react-bootstrap'
 import { useAuth } from '../contexts/AuthContext'
 import { Link, useHistory } from 'react-router-dom'
 import Header from './Header'
@@ -47,35 +47,37 @@ export default function UpdateProfile() {
     return (
         <>
             <Header />
-            <TitleCard />
-            <Card>
-                <Card.Body>
-                    <h2 className="text-center mb-4">
-                        Update Profile
+            <Container style={{ maxWidth: "400px" }}>
+                <TitleCard />
+                <Card>
+                    <Card.Body>
+                        <h2 className="text-center mb-4">
+                            Update Profile
                     </h2>
-                    {error && <Alert variant="danger">{error}</Alert>}
-                    <form onSubmit={handleSubmit}>
-                        <Form.Group id="email">
-                            <Form.Label>Email</Form.Label>
-                            <Form.Control type="email" ref={emailRef} required defaultValue={currentUser.email} />
-                        </Form.Group>
-                        <Form.Group id="password">
-                            <Form.Label>Password</Form.Label>
-                            <Form.Control type="password" ref={passwordRef} placeholder="Leave blank to keep current password" />
-                        </Form.Group>
-                        <Form.Group id="password-confirm">
-                            <Form.Label>Confirm Password</Form.Label>
-                            <Form.Control type="password" ref={passwordConfirmRef} placeholder="Leave blank to keep current password" />
-                        </Form.Group>
-                        <Button disabled={loading} className="w-100 mt-2" type="submit">
-                            Update
+                        {error && <Alert variant="danger">{error}</Alert>}
+                        <form onSubmit={handleSubmit}>
+                            <Form.Group id="email">
+                                <Form.Label>Email</Form.Label>
+                                <Form.Control type="email" ref={emailRef} required defaultValue={currentUser.email} />
+                            </Form.Group>
+                            <Form.Group id="password">
+                                <Form.Label>Password</Form.Label>
+                                <Form.Control type="password" ref={passwordRef} placeholder="Leave blank to keep current password" />
+                            </Form.Group>
+                            <Form.Group id="password-confirm">
+                                <Form.Label>Confirm Password</Form.Label>
+                                <Form.Control type="password" ref={passwordConfirmRef} placeholder="Leave blank to keep current password" />
+                            </Form.Group>
+                            <Button disabled={loading} className="w-100 mt-2" type="submit">
+                                Update
                         </Button>
-                    </form>
-                </Card.Body>
-            </Card>
-            <div className="w-100 text-center mt-2">
-                <Link to="/dashboard">Nevermind</Link>
-            </div>
+                        </form>
+                    </Card.Body>
+                </Card>
+                <div className="w-100 text-center mt-2">
+                    <Link to="/dashboard">Nevermind</Link>
+                </div>
+            </Container>
         </>
     )
 }
