@@ -334,7 +334,7 @@ export default function Board() {
     //////////////////////////////////////////////////////////////////
 
     useEffect(() => {
-        fetch(`http://localhost:5000/boards/${id}`)
+        fetch(`https://managetheday.herokuapp.com/${id}`)
             .then(getBoard(id))
     }, [])
 
@@ -346,12 +346,12 @@ export default function Board() {
         <div className="columns-page">
             <Header />
             <h1 className="text-center">{board.title}</h1>
-            <Button onClick={updateColumnOrder}>Save Board</Button>
+            <Button onClick={updateColumnOrder}>Save Board Configuration</Button>
             <h4 className="text-center">Owned by: {boardOwner}</h4>
             {
-                //////////////////////////////////
-                // COLUMNS CONTAINER [HORIZONTAL LIST]
-                //////////////////////////////////
+                ///////////////////////////////////////
+                // COLUMNS CONTAINER [HORIZONTAL LIST OF VERTICAL LISTS]
+                ///////////////////////////////////////
             }
             <div className="columns">
                 {columnOrder.map((columnID) => {
