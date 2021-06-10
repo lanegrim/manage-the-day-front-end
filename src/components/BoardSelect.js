@@ -26,7 +26,6 @@ export default function BoardSelect() {
             .then(
                 (response) => {
                     setBoards(response.data.boards)
-                    console.log(response.data.boards)
                 },
                 (err) => console.error(err)
             )
