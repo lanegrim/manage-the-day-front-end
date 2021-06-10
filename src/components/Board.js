@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useLayoutEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Card, ListGroup, ListGroupItem, Button, Modal, Form } from 'react-bootstrap'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
@@ -51,6 +51,19 @@ export default function Board() {
                     setCollaborators(response.data.board.collaborators)
                     setBoardOwner(response.data.board.owner)
                     setColumnOrder(response.data.board.columnOrder)
+
+                    if (response.data.board.columns.length > response.data.board.columnOrder.length) {
+                        // let newColumn = response.data.board.columns[response.data.board.columns.length - 1]
+                        // console.log(newColumn)
+                        // setColumnOrder([...response.data.board.columnOrder, newColumn.id],
+                        //     console.log(columnOrder))
+                        let newColumnOrder = []
+                        response.data.board.columns.map((column) => {
+                            newColumnOrder.push(column.id)
+                            console.log(newColumnOrder)
+                        })
+                        setColumnOrder(newColumnOrder)
+                    }
                 },
                 (err) => console.error(err)
             )
@@ -109,6 +122,32 @@ export default function Board() {
     }
 
     //////////////////////////////////////////////////////////////////
+    // UPDATE COLUMN ORDER IN DB ON SAVE
+    //////////////////////////////////////////////////////////////////
+
+    const updateColumnOrder = () => {
+        let updatedBoard = {
+            owner: boardOwner,
+            title: board.title,
+            columnOrder: tempColumnOrder,
+            collaborators: board.collaborators
+        }
+
+        console.log(updatedBoard)
+
+        axios
+            .put(
+                "https://managetheday-api.herokuapp.com/boards/" + board.id,
+                updatedBoard
+            )
+            .then((response) => {
+            })
+            .catch((error) => console.error(error))
+    }
+
+
+
+    //////////////////////////////////////////////////////////////////
     // COLUMN CRUD FUNCTIONS
     //////////////////////////////////////////////////////////////////
 
@@ -155,8 +194,8 @@ export default function Board() {
 
         axios.post('https://managetheday-api.herokuapp.com/columns', newColumn)
             .then((response) => {
-                getBoard(board.id)
                 setLoading(false)
+                getBoard(board.id)
                 event.target.reset()
             },
                 (err) => console.error(err)
@@ -277,32 +316,7 @@ export default function Board() {
 
 
     //////////////////////////////////////////////////////////////////
-    // UPDATE COLUMN ORDER IN DB ON SAVE
-    //////////////////////////////////////////////////////////////////
-
-    const updateColumnOrder = () => {
-        let updatedBoard = {
-            owner: boardOwner,
-            title: board.title,
-            columnOrder: tempColumnOrder,
-            collaborators: board.collaborators
-        }
-
-        console.log(updatedBoard)
-
-        axios
-            .put(
-                "https://managetheday-api.herokuapp.com/boards/" + board.id,
-                updatedBoard
-            )
-            .then((response) => {
-            })
-            .catch((error) => console.error(error))
-    }
-
-
-    //////////////////////////////////////////////////////////////////
-    // LOAD DATA ON MOUNT
+    // EFFECTS
     //////////////////////////////////////////////////////////////////
 
     useEffect(() => {
@@ -327,13 +341,17 @@ export default function Board() {
             }
             <div className="columns">
                 {columnOrder.map((columnID) => {
+                    console.log(columnOrder)
+                    console.log(columns)
+                    console.log(columnID)
                     let columnArray = columns.filter((obj) => {
-                        return (obj.id.toString() === columnID)
+                        return (obj.id == columnID)
                     })
+                    console.log(columnArray)
                     let column = columnArray[0]
-                    tempColumnOrder.push(column.id)
-                    console.log(tempColumnOrder)
                     console.log(column)
+                    tempColumnOrder = [...tempColumnOrder, column.id]
+                    console.log(tempColumnOrder)
                     return (
                         <Card key={columnID} className='board-column'>
                             {
