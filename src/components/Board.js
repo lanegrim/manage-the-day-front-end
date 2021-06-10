@@ -53,16 +53,13 @@ export default function Board() {
                     setColumnOrder(response.data.board.columnOrder)
 
                     if (response.data.board.columns.length > response.data.board.columnOrder.length) {
-                        // let newColumn = response.data.board.columns[response.data.board.columns.length - 1]
-                        // console.log(newColumn)
-                        // setColumnOrder([...response.data.board.columnOrder, newColumn.id],
-                        //     console.log(columnOrder))
                         let newColumnOrder = []
                         response.data.board.columns.map((column) => {
                             newColumnOrder.push(column.id)
                             console.log(newColumnOrder)
                         })
                         setColumnOrder(newColumnOrder)
+                        updateColumnOrder()
                     }
                 },
                 (err) => console.error(err)
@@ -129,7 +126,7 @@ export default function Board() {
         let updatedBoard = {
             owner: boardOwner,
             title: board.title,
-            columnOrder: tempColumnOrder,
+            columnOrder: columnOrder,
             collaborators: board.collaborators
         }
 
@@ -158,6 +155,7 @@ export default function Board() {
             title: columnNameRef.current.value,
             todoOrder: []
         }
+        setLoading(true)
 
         axios
             .put(
@@ -167,6 +165,7 @@ export default function Board() {
             .then((response) => {
                 getBoard(board.id)
                 closeEditColumnModal()
+                setLoading(false)
             })
             .catch((error) => console.error(error));
     }
@@ -220,6 +219,8 @@ export default function Board() {
             completed: completionStatus
         }
 
+        setLoading(true)
+
         axios
             .put(
                 "https://managetheday-api.herokuapp.com/todos/" + currentItemID,
@@ -228,6 +229,7 @@ export default function Board() {
             .then((response) => {
                 getBoard(board.id)
                 closeEditTodoModal()
+                setLoading(false)
             })
             .catch((error) => console.error(error));
     }
@@ -341,7 +343,7 @@ export default function Board() {
             }
             <div className="columns">
                 {columnOrder.map((columnID) => {
-                    console.log(columnOrder)
+                    console.log(tempColumnOrder)
                     console.log(columns)
                     console.log(columnID)
                     let columnArray = columns.filter((obj) => {
@@ -350,7 +352,7 @@ export default function Board() {
                     console.log(columnArray)
                     let column = columnArray[0]
                     console.log(column)
-                    tempColumnOrder = [...tempColumnOrder, column.id]
+                    // tempColumnOrder = [...tempColumnOrder, column.id]
                     console.log(tempColumnOrder)
                     return (
                         <Card key={columnID} className='board-column'>
@@ -419,7 +421,7 @@ export default function Board() {
                                                                     <option>Completed</option>
                                                                 </Form.Control>
                                                             </Form.Group>
-                                                            <Button className="w-100 mt-2" type="submit" variant='success'>
+                                                            <Button className="w-100 mt-2" type="submit" variant='success' disabled={loading}>
                                                                 Update Task
                                                 </Button>
                                                         </form>
@@ -480,11 +482,11 @@ export default function Board() {
                                                         required
                                                         defaultValue={currentItemName} />
                                                 </Form.Group>
-                                                <Button className="w-100 mt-2" type="submit" variant='success'>
+                                                <Button className="w-100 mt-2" type="submit" variant='success' disabled={loading}>
                                                     Update Column
                                                 </Button>
                                             </form>
-                                            <Button className="w-100 mt-2" variant='danger' onClick={deleteColumn}>
+                                            <Button className="w-100 mt-2" variant='danger' onClick={deleteColumn} disabled={loading}>
                                                 Delete Column
                                                 </Button>
                                         </Modal.Body>
@@ -562,7 +564,7 @@ export default function Board() {
                                     ref={collaboratorFourRef}
                                     defaultValue={collaborators[3]} />
                             </Form.Group>
-                            <Button className="w-100 mt-2" type="submit" variant='success'>
+                            <Button className="w-100 mt-2" type="submit" variant='success' disabled={loading}>
                                 Update Collaborators
                             </Button>
                         </form>
