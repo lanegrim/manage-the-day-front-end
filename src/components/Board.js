@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom'
 import axios from 'axios'
 import Header from './Header'
 import { useAuth } from '../contexts/AuthContext'
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
 
 export default function Board() {
 
@@ -21,6 +22,7 @@ export default function Board() {
     let tempColumnOrder = []
     const [currentItemID, setCurrentItemID] = useState('')
     const [loading, setLoading] = useState(false)
+    const [needReload, setNeedReload] = useState(false)
     const [currentItemName, setCurrentItemName] = useState('')
     const [currentTodoColumn_ID, setCurrentTodoColumn_ID] = useState('')
     const columnNameRef = useRef()
@@ -41,12 +43,12 @@ export default function Board() {
     // GET DATA FUNCTION
     //////////////////////////////////////////////////////////////////
 
-    const getBoard = (givenID) => {
+    const getBoard = () => {
         axios
-            .get(`https://managetheday-api.herokuapp.com/boards/${givenID}`)
+            .get(`https://managetheday-api.herokuapp.com/boards/${id}`)
             .then(
                 (response) => {
-                    setBoard(response.data.board, console.log(response.data.board))
+                    setBoard(response.data.board)
                     setColumns(response.data.board.columns)
                     setCollaborators(response.data.board.collaborators)
                     setBoardOwner(response.data.board.owner)
@@ -55,7 +57,6 @@ export default function Board() {
                         let newColumnOrder = []
                         response.data.board.columns.map((column) => {
                             newColumnOrder.push(column.id)
-                            console.log(newColumnOrder)
                         })
                         setColumnOrder(newColumnOrder)
                         tempColumnOrder = (newColumnOrder)
@@ -67,6 +68,17 @@ export default function Board() {
             )
             .catch((error) => console.error(error));
     };
+
+    //////////////////////////////////////////////////////////////////
+    // DRAG/DROP HANDLER
+    //////////////////////////////////////////////////////////////////
+
+    const handleOnDragEnd = (result) => {
+        const items = Array.from(columnOrder)
+        const [reorderedColumn] = items.splice(result.source.index, 1)
+        items.splice(result.destination.index, 0, reorderedColumn)
+        setColumnOrder(items, setNeedReload(!needReload))
+    }
 
     //////////////////////////////////////////////////////////////////
     // OPEN / CLOSE MODALS FUNCTIONS
@@ -112,7 +124,6 @@ export default function Board() {
         if (currentUser.email === boardOwner) {
             setShowCollaboratorsModal(true)
         }
-        console.log(collaborators)
     }
 
     const closeCollaboratorsModal = (event) => {
@@ -130,8 +141,6 @@ export default function Board() {
             columnOrder: columnOrder,
             collaborators: board.collaborators
         }
-
-        console.log(updatedBoard)
 
         axios
             .put(
@@ -175,11 +184,8 @@ export default function Board() {
     const deleteColumn = () => {
         setLoading(true)
         let updatedColumnOrder = columnOrder
-        console.log(updatedColumnOrder.indexOf(currentItemID))
         updatedColumnOrder.splice(updatedColumnOrder.indexOf(currentItemID), 1)
-        console.log(updatedColumnOrder)
         setColumnOrder(updatedColumnOrder)
-        console.log(columnOrder)
         updateColumnOrder()
 
         axios
@@ -206,7 +212,7 @@ export default function Board() {
         axios.post('https://managetheday-api.herokuapp.com/columns', newColumn)
             .then((response) => {
                 setLoading(false)
-                getBoard(board.id)
+                setNeedReload(!needReload)
                 event.target.reset()
             },
                 (err) => console.error(err)
@@ -308,8 +314,6 @@ export default function Board() {
             collaborators: collaboratorArray
         }
 
-        console.log(updatedBoard)
-
         axios
             .put(
                 "https://managetheday-api.herokuapp.com/boards/" + board.id,
@@ -334,9 +338,12 @@ export default function Board() {
     //////////////////////////////////////////////////////////////////
 
     useEffect(() => {
-        fetch(`https://managetheday.herokuapp.com/${id}`)
-            .then(getBoard(id))
+        getBoard()
     }, [])
+
+    useEffect(() => {
+        updateColumnOrder()
+    }, [needReload])
 
     //////////////////////////////////////////////////////////////////
     // RENDER
@@ -346,196 +353,207 @@ export default function Board() {
         <div className="columns-page">
             <Header />
             <h1 className="text-center">{board.title}</h1>
-            <Button onClick={updateColumnOrder}>Save Board Configuration</Button>
+            {/* <Button onClick={updateColumnOrder}>Save Board Configuration</Button> */}
             <h4 className="text-center">Owned by: {boardOwner}</h4>
             {
                 ///////////////////////////////////////
                 // COLUMNS CONTAINER [HORIZONTAL LIST OF VERTICAL LISTS]
                 ///////////////////////////////////////
             }
-            <div className="columns">
-                {columnOrder.map((columnID) => {
-                    if (columnOrder.indexOf(columnID) === 0) {
-                        tempColumnOrder = []
-                    }
-                    console.log(columns)
-                    console.log(columnID)
-                    let columnArray = columns.filter((obj) => {
-                        return (obj.id == columnID)
-                    })
-                    console.log(columnArray)
-                    let column = columnArray[0]
-                    console.log(column)
-                    tempColumnOrder = [...tempColumnOrder, column.id]
-                    console.log(tempColumnOrder)
-                    return (
-                        <Card key={columnID} className='board-column'>
-                            {
-                                //////////////////////////////////
-                                // COLUMN CARD
-                                //////////////////////////////////
-                            }
-                            <Card.Header className="text-center" style={{ minHeight: '75px' }}>
-                                {column.title}
-                                <Button className="edit-btn"
-                                    onClick={openEditColumnModal}
-                                    id={column.id}
-                                    name={column.title}
-                                >
-                                    <img alt='Edit' src='/outline_edit_note_white_24dp.png' className='edit-img'></img>
-                                </Button>
-                            </Card.Header>
-                            <Card.Body>
-                                {
-                                    //////////////////////////////////
-                                    // TODO CARD
-                                    //////////////////////////////////
+            <DragDropContext onDragEnd={handleOnDragEnd}>
+                <Droppable droppableId='columns' direction='horizontal'>
+                    {(provided) => (
+                        <div className="columns" {...provided.droppableProps} ref={provided.innerRef}>
+                            {columnOrder.map((columnID, index) => {
+                                if (columnOrder.indexOf(columnID) === 0) {
+                                    tempColumnOrder = []
                                 }
-                                <ListGroup variant='flush'>
-                                    {column.todos.map((todo) => {
-                                        return (
-                                            <ListGroupItem key={todo.id} id={todo.column_id}>
-                                                {isComplete(todo)}
-                                                {todo.task}
-                                                <Button className="edit-btn"
-                                                    onClick={openEditTodoModal}
-                                                    id={todo.id}
-                                                    name={todo.task}
-                                                >
-                                                    <img alt='Edit'
-                                                        src='/outline_edit_note_white_24dp.png' className='edit-img'></img>
-                                                </Button>
 
-                                                <Modal show={showEditTodoModal} onHide={closeEditTodoModal} centered>
+                                let columnArray = columns.filter((obj) => {
+                                    return (obj.id == columnID)
+                                })
+
+                                let column = columnArray[0]
+                                tempColumnOrder = [...tempColumnOrder, column.id]
+                                return (
+                                    <Draggable key={columnID} draggableId={columnID.toString()} index={index}>
+                                        {(provided) => (
+                                            <Card className='board-column'
+                                                {...provided.draggableProps}
+                                                {...provided.dragHandleProps}
+                                                ref={provided.innerRef}>
+                                                {
+                                                    //////////////////////////////////
+                                                    // COLUMN CARD
+                                                    //////////////////////////////////
+                                                }
+                                                <Card.Header className="text-center" style={{ minHeight: '75px' }}>
+                                                    {column.title}
+                                                    <Button className="edit-btn"
+                                                        onClick={openEditColumnModal}
+                                                        id={column.id}
+                                                        name={column.title}
+                                                    >
+                                                        <img alt='Edit' src='/outline_edit_note_white_24dp.png' className='edit-img'></img>
+                                                    </Button>
+                                                </Card.Header>
+                                                <Card.Body>
                                                     {
                                                         //////////////////////////////////
-                                                        // TODO EDIT MODAL
+                                                        // TODO CARD
                                                         //////////////////////////////////
                                                     }
-                                                    <Modal.Header closeButton>
-                                                        <Modal.Title>Edit "{currentItemName}"</Modal.Title>
-                                                    </Modal.Header>
-                                                    <Modal.Body>
-                                                        <form onSubmit={editTodo} id={column.id}>
-                                                            <Form.Group id="todoName">
-                                                                <Form.Label>Task Name</Form.Label>
-                                                                <Form.Control
-                                                                    type="text"
-                                                                    ref={todoNameRef}
-                                                                    required
-                                                                    defaultValue={currentItemName} />
-                                                            </Form.Group>
-                                                            <Form.Group id="todoCompleted">
-                                                                <Form.Label>Task Completed?</Form.Label>
-                                                                <Form.Control
-                                                                    as="select"
-                                                                    ref={todoCompletedRef}
-                                                                >
-                                                                    <option>Incomplete</option>
-                                                                    <option>Completed</option>
-                                                                </Form.Control>
-                                                            </Form.Group>
-                                                            <Button className="w-100 mt-2" type="submit" variant='success' disabled={loading}>
-                                                                Update Task
-                                                </Button>
-                                                        </form>
-                                                        <Button className="w-100 mt-2" variant='danger' onClick={deleteTodo}>
-                                                            Delete Task
-                                                </Button>
-                                                    </Modal.Body>
-                                                </Modal>
-                                            </ListGroupItem>
-                                        )
-                                    })}
-                                    <ListGroupItem>
-                                        <Button
-                                            className="w-100 mt-2"
-                                            onClick={openNewTodoModal}
-                                            id={column.id}>
-                                            Add a New Task
+                                                    <ListGroup variant='flush'>
+                                                        {column.todos.map((todo) => {
+                                                            return (
+                                                                <ListGroupItem key={todo.id} id={todo.column_id}>
+                                                                    {isComplete(todo)}
+                                                                    {todo.task}
+                                                                    <Button className="edit-btn"
+                                                                        onClick={openEditTodoModal}
+                                                                        id={todo.id}
+                                                                        name={todo.task}
+                                                                    >
+                                                                        <img alt='Edit'
+                                                                            src='/outline_edit_note_white_24dp.png' className='edit-img'></img>
+                                                                    </Button>
+
+                                                                    <Modal show={showEditTodoModal} onHide={closeEditTodoModal} centered>
+                                                                        {
+                                                                            //////////////////////////////////
+                                                                            // TODO EDIT MODAL
+                                                                            //////////////////////////////////
+                                                                        }
+                                                                        <Modal.Header closeButton>
+                                                                            <Modal.Title>Edit "{currentItemName}"</Modal.Title>
+                                                                        </Modal.Header>
+                                                                        <Modal.Body>
+                                                                            <form onSubmit={editTodo} id={column.id}>
+                                                                                <Form.Group id="todoName">
+                                                                                    <Form.Label>Task Name</Form.Label>
+                                                                                    <Form.Control
+                                                                                        type="text"
+                                                                                        ref={todoNameRef}
+                                                                                        required
+                                                                                        defaultValue={currentItemName} />
+                                                                                </Form.Group>
+                                                                                <Form.Group id="todoCompleted">
+                                                                                    <Form.Label>Task Completed?</Form.Label>
+                                                                                    <Form.Control
+                                                                                        as="select"
+                                                                                        ref={todoCompletedRef}
+                                                                                    >
+                                                                                        <option>Incomplete</option>
+                                                                                        <option>Completed</option>
+                                                                                    </Form.Control>
+                                                                                </Form.Group>
+                                                                                <Button className="w-100 mt-2" type="submit" variant='success' disabled={loading}>
+                                                                                    Update Task
+                                                                                </Button>
+                                                                            </form>
+                                                                            <Button className="w-100 mt-2" variant='danger' onClick={deleteTodo}>
+                                                                                Delete Task
+                                                                            </Button>
+                                                                        </Modal.Body>
+                                                                    </Modal>
+                                                                </ListGroupItem>
+                                                            )
+                                                        })}
+                                                        <ListGroupItem>
+                                                            <Button
+                                                                className="w-100 mt-2"
+                                                                onClick={openNewTodoModal}
+                                                                id={column.id}>
+                                                                Add a New Task
+                                                            </Button>
+                                                        </ListGroupItem>
+                                                        <Modal show={showNewTodoModal} onHide={closeNewTodoModal} centered>
+                                                            {
+                                                                //////////////////////////////////
+                                                                // TODO CREATE MODAL
+                                                                //////////////////////////////////
+                                                            }
+                                                            <Modal.Header closeButton>Add a New Task</Modal.Header>
+                                                            <Modal.Body>
+                                                                <form onSubmit={addTodo} id={currentTodoColumn_ID}>
+                                                                    <Form.Group id="todoName">
+                                                                        <Form.Control
+                                                                            type="text"
+                                                                            ref={todoNameRef}
+                                                                            required
+                                                                            placeholder='Name Your New Task' />
+                                                                    </Form.Group>
+                                                                    <Button className="w-100 mt-2" type="submit" variant='success' disabled={loading}>
+                                                                        Create Task
                                             </Button>
-                                    </ListGroupItem>
-                                    <Modal show={showNewTodoModal} onHide={closeNewTodoModal} centered>
-                                        {
-                                            //////////////////////////////////
-                                            // TODO CREATE MODAL
-                                            //////////////////////////////////
-                                        }
-                                        <Modal.Header closeButton>Add a New Task</Modal.Header>
-                                        <Modal.Body>
-                                            <form onSubmit={addTodo} id={currentTodoColumn_ID}>
-                                                <Form.Group id="todoName">
-                                                    <Form.Control
-                                                        type="text"
-                                                        ref={todoNameRef}
-                                                        required
-                                                        placeholder='Name Your New Task' />
-                                                </Form.Group>
-                                                <Button className="w-100 mt-2" type="submit" variant='success' disabled={loading}>
-                                                    Create Task
-                                            </Button>
-                                            </form>
-                                        </Modal.Body>
-                                    </Modal>
-                                    <Modal show={showEditColumnModal} onHide={closeEditColumnModal} centered>
-                                        {
-                                            //////////////////////////////////
-                                            // COLUMN EDIT MODAL
-                                            //////////////////////////////////
-                                        }
-                                        <Modal.Header closeButton>
-                                            <Modal.Title>Edit "{currentItemName}"</Modal.Title>
-                                        </Modal.Header>
-                                        <Modal.Body>
-                                            <form onSubmit={editColumn} id="columnName">
-                                                <Form.Group>
-                                                    <Form.Label>Column title</Form.Label>
-                                                    <Form.Control
-                                                        type="text"
-                                                        ref={columnNameRef}
-                                                        required
-                                                        defaultValue={currentItemName} />
-                                                </Form.Group>
-                                                <Button className="w-100 mt-2" type="submit" variant='success' disabled={loading}>
-                                                    Update Column
+                                                                </form>
+                                                            </Modal.Body>
+                                                        </Modal>
+                                                        <Modal show={showEditColumnModal} onHide={closeEditColumnModal} centered>
+                                                            {
+                                                                //////////////////////////////////
+                                                                // COLUMN EDIT MODAL
+                                                                //////////////////////////////////
+                                                            }
+                                                            <Modal.Header closeButton>
+                                                                <Modal.Title>Edit "{currentItemName}"</Modal.Title>
+                                                            </Modal.Header>
+                                                            <Modal.Body>
+                                                                <form onSubmit={editColumn} id="columnName">
+                                                                    <Form.Group>
+                                                                        <Form.Label>Column title</Form.Label>
+                                                                        <Form.Control
+                                                                            type="text"
+                                                                            ref={columnNameRef}
+                                                                            required
+                                                                            defaultValue={currentItemName} />
+                                                                    </Form.Group>
+                                                                    <Button className="w-100 mt-2" type="submit" variant='success' disabled={loading}>
+                                                                        Update Column
                                                 </Button>
-                                            </form>
-                                            <Button className="w-100 mt-2" variant='danger' onClick={deleteColumn} disabled={loading}>
-                                                Delete Column
+                                                                </form>
+                                                                <Button className="w-100 mt-2" variant='danger' onClick={deleteColumn} disabled={loading}>
+                                                                    Delete Column
                                                 </Button>
-                                        </Modal.Body>
-                                    </Modal>
-                                </ListGroup>
-                            </Card.Body>
-                        </Card>
-                    )
-                }
-                )}
-                <Card className='board-column'>
-                    {
-                        //////////////////////////////////
-                        // COLUMN CREATE CARD
-                        //////////////////////////////////
-                    }
-                    <Card.Header className="text-center" style={{ minHeight: '75px' }}>
-                        Add a New Column
-                    </Card.Header>
-                    <Card.Body>
-                        <form onSubmit={addColumn}>
-                            <Form.Group id="boardName">
-                                <Form.Control
-                                    type="text"
-                                    ref={newColumnNameRef}
-                                    required
-                                    placeholder='Name Your New Column' />
-                            </Form.Group>
-                            <Button className="w-100 mt-2" type="submit" variant='success' disabled={loading}>
-                                Create Column
+                                                            </Modal.Body>
+                                                        </Modal>
+                                                    </ListGroup>
+                                                </Card.Body>
+                                            </Card>
+                                        )}
+                                    </Draggable>
+                                )
+                            }
+                            )}
+                            {provided.placeholder}
+                            <Card className='board-column'>
+                                {
+                                    //////////////////////////////////
+                                    // COLUMN CREATE CARD
+                                    //////////////////////////////////
+                                }
+                                <Card.Header className="text-center" style={{ minHeight: '75px' }}>
+                                    Add a New Column
+                                </Card.Header>
+                                <Card.Body>
+                                    <form onSubmit={addColumn}>
+                                        <Form.Group id="boardName">
+                                            <Form.Control
+                                                type="text"
+                                                ref={newColumnNameRef}
+                                                required
+                                                placeholder='Name Your New Column' />
+                                        </Form.Group>
+                                        <Button className="w-100 mt-2" type="submit" variant='success' disabled={loading}>
+                                            Create Column
                                 </Button>
-                        </form>
-                    </Card.Body>
-                </Card>
-            </div>
+                                    </form>
+                                </Card.Body>
+                            </Card>
+                        </div>
+                    )}
+                </Droppable>
+            </DragDropContext>
             <div>
                 {CollaboratorsButton}
                 <Modal show={showCollaboratorsModal} onHide={closeCollaboratorsModal} centered>
