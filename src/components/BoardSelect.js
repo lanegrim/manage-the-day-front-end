@@ -125,7 +125,6 @@ export default function BoardSelect() {
                     <Card.Body>
                         <ListGroup variant='flush'>
                             {boards.map((board) => {
-                                console.log(board)
                                 if (board.owner === currentUser.email) {
                                     return <ListGroupItem key={board.id}>
                                         <Button onClick={() => { history.push(`/boards/${board.id}`) }}>

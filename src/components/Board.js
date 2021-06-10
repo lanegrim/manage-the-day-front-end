@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react'
 import { Card, ListGroup, ListGroupItem, Button, Modal, Form } from 'react-bootstrap'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
@@ -15,9 +15,10 @@ export default function Board() {
     const { id } = useParams()
     const [board, setBoard] = useState({ columns: [], id: '' })
     const [columns, setColumns] = useState([])
-    const [collaborators, setCollaborators] = useState(['', '', '', ''])
+    const [collaborators, setCollaborators] = useState([])
     const [boardOwner, setBoardOwner] = useState('')
-    // const [columnOrder, setColumnOrder] = useState([])
+    const [columnOrder, setColumnOrder] = useState([])
+    let tempColumnOrder = []
     const [currentItemID, setCurrentItemID] = useState('')
     const [loading, setLoading] = useState(false)
     const [currentItemName, setCurrentItemName] = useState('')
@@ -45,26 +46,16 @@ export default function Board() {
             .get(`https://managetheday-api.herokuapp.com/boards/${givenID}`)
             .then(
                 (response) => {
-                    setBoard(response.data.board)
+                    setBoard(response.data.board, console.log(response.data.board))
                     setColumns(response.data.board.columns)
                     setCollaborators(response.data.board.collaborators)
                     setBoardOwner(response.data.board.owner)
+                    setColumnOrder(response.data.board.columnOrder)
                 },
                 (err) => console.error(err)
             )
             .catch((error) => console.error(error));
     };
-
-    //////////////////////////////////////////////////////////////////
-    // LOAD BOARD DATA ON MOUNT
-    //////////////////////////////////////////////////////////////////
-
-    useEffect(() => {
-        fetch(`http://localhost:5000/boards/${id}`)
-            .then(
-                getBoard(id)
-            )
-    }, [id])
 
     //////////////////////////////////////////////////////////////////
     // OPEN / CLOSE MODALS FUNCTIONS
@@ -110,6 +101,7 @@ export default function Board() {
         if (currentUser.email === boardOwner) {
             setShowCollaboratorsModal(true)
         }
+        console.log(collaborators)
     }
 
     const closeCollaboratorsModal = (event) => {
@@ -241,12 +233,6 @@ export default function Board() {
         }
     }
 
-    // const completionRule = (todo) => {
-    //     if (todo.completed === true) {
-    //         return
-    //     }
-    // }
-
     //////////////////////////////////////////////////////////////////
     // ADD AND REMOVE COLLABORATORS
     //////////////////////////////////////////////////////////////////
@@ -289,6 +275,41 @@ export default function Board() {
         )
     }
 
+
+    //////////////////////////////////////////////////////////////////
+    // UPDATE COLUMN ORDER IN DB ON SAVE
+    //////////////////////////////////////////////////////////////////
+
+    const updateColumnOrder = () => {
+        let updatedBoard = {
+            owner: boardOwner,
+            title: board.title,
+            columnOrder: tempColumnOrder,
+            collaborators: board.collaborators
+        }
+
+        console.log(updatedBoard)
+
+        axios
+            .put(
+                "https://managetheday-api.herokuapp.com/boards/" + board.id,
+                updatedBoard
+            )
+            .then((response) => {
+            })
+            .catch((error) => console.error(error))
+    }
+
+
+    //////////////////////////////////////////////////////////////////
+    // LOAD DATA ON MOUNT
+    //////////////////////////////////////////////////////////////////
+
+    useEffect(() => {
+        fetch(`http://localhost:5000/boards/${id}`)
+            .then(getBoard(id))
+    }, [])
+
     //////////////////////////////////////////////////////////////////
     // RENDER
     //////////////////////////////////////////////////////////////////
@@ -297,6 +318,7 @@ export default function Board() {
         <div className="columns-page">
             <Header />
             <h1 className="text-center">{board.title}</h1>
+            <Button onClick={updateColumnOrder}>Save Board</Button>
             <h4 className="text-center">Owned by: {boardOwner}</h4>
             {
                 //////////////////////////////////
@@ -304,9 +326,16 @@ export default function Board() {
                 //////////////////////////////////
             }
             <div className="columns">
-                {columns.map((column) => {
+                {columnOrder.map((columnID) => {
+                    let columnArray = columns.filter((obj) => {
+                        return (obj.id.toString() === columnID)
+                    })
+                    let column = columnArray[0]
+                    tempColumnOrder.push(column.id)
+                    console.log(tempColumnOrder)
+                    console.log(column)
                     return (
-                        <Card key={column.id} className='board-column'>
+                        <Card key={columnID} className='board-column'>
                             {
                                 //////////////////////////////////
                                 // COLUMN CARD
@@ -332,7 +361,6 @@ export default function Board() {
                                     {column.todos.map((todo) => {
                                         return (
                                             <ListGroupItem key={todo.id} id={todo.column_id}>
-                                                {/* {completionRule(todo)} */}
                                                 {isComplete(todo)}
                                                 {todo.task}
                                                 <Button className="edit-btn"
@@ -447,7 +475,8 @@ export default function Board() {
                             </Card.Body>
                         </Card>
                     )
-                })}
+                }
+                )}
                 <Card className='board-column'>
                     {
                         //////////////////////////////////
@@ -492,28 +521,28 @@ export default function Board() {
                                 <Form.Control
                                     type="text"
                                     ref={collaboratorOneRef}
-                                    defaultValue={collaborators[0][0]} />
+                                    defaultValue={collaborators[0]} />
                             </Form.Group>
                             <Form.Group>
                                 <Form.Label>Collaborator 2</Form.Label>
                                 <Form.Control
                                     type="text"
                                     ref={collaboratorTwoRef}
-                                    defaultValue={collaborators[0][1]} />
+                                    defaultValue={collaborators[1]} />
                             </Form.Group>
                             <Form.Group>
                                 <Form.Label>Collaborator 3</Form.Label>
                                 <Form.Control
                                     type="text"
                                     ref={collaboratorThreeRef}
-                                    defaultValue={collaborators[0][2]} />
+                                    defaultValue={collaborators[2]} />
                             </Form.Group>
                             <Form.Group>
                                 <Form.Label>Collaborator 4</Form.Label>
                                 <Form.Control
                                     type="text"
                                     ref={collaboratorFourRef}
-                                    defaultValue={collaborators[0][3]} />
+                                    defaultValue={collaborators[3]} />
                             </Form.Group>
                             <Button className="w-100 mt-2" type="submit" variant='success'>
                                 Update Collaborators
