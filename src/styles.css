@@ -55,7 +55,7 @@
 }
 
 .board-column {
-    min-width: 350px;
+    width: 350px;
     min-height: 500px;
 }
 
