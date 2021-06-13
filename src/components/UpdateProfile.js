@@ -47,8 +47,8 @@ export default function UpdateProfile() {
     return (
         <>
             <Header />
-            <Container style={{ maxWidth: "400px" }}>
-                <TitleCard />
+            <TitleCard />
+            <Container className='d-flex flex-column justify-content-center' style={{ maxWidth: "400px", height: "70vh" }}>
                 <Card>
                     <Card.Body>
                         <h2 className="text-center mb-4">

@@ -1,6 +1,6 @@
-/* .contains-all {
-    max-width: 400px;
-} */
+.contains-all {
+    padding-bottom: 3em;
+}
 
 /* HEADER */
 .header {
@@ -49,7 +49,7 @@
 .columns {
     display: flex;
     overflow-x: scroll;
-    gap: 5%;
+    gap: 2.5%;
     margin: auto 1em;
     padding: auto 1em;
 }
@@ -84,6 +84,10 @@
     width: 200px;
     max-width: 200px;
     overflow: wrap;
+}
+
+.collab-btn {
+    margin: 1em 0 0 1em;
 }
 
 @media(max-width:600px) {

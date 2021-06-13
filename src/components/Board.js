@@ -329,7 +329,12 @@ export default function Board() {
 
     if (currentUser.email === boardOwner) {
         var CollaboratorsButton = (
-            <Button onClick={openCollaboratorsModal} ref={collaboratorsButtonRef}>Add Collaborators</Button>
+            <Button
+                onClick={openCollaboratorsModal}
+                ref={collaboratorsButtonRef}
+                className='collab-btn'>
+                Add Collaborators
+            </Button>
         )
     }
 
