@@ -329,7 +329,12 @@ export default function Board() {
 
     if (currentUser.email === boardOwner) {
         var CollaboratorsButton = (
-            <Button onClick={openCollaboratorsModal} ref={collaboratorsButtonRef}>Add Collaborators</Button>
+            <Button
+                onClick={openCollaboratorsModal}
+                ref={collaboratorsButtonRef}
+                className='collab-btn'>
+                Add Collaborators
+            </Button>
         )
     }
 
@@ -486,7 +491,7 @@ export default function Board() {
                                                                     </Form.Group>
                                                                     <Button className="w-100 mt-2" type="submit" variant='success' disabled={loading}>
                                                                         Create Task
-                                            </Button>
+                                                                    </Button>
                                                                 </form>
                                                             </Modal.Body>
                                                         </Modal>
@@ -511,11 +516,11 @@ export default function Board() {
                                                                     </Form.Group>
                                                                     <Button className="w-100 mt-2" type="submit" variant='success' disabled={loading}>
                                                                         Update Column
-                                                </Button>
+                                                                    </Button>
                                                                 </form>
                                                                 <Button className="w-100 mt-2" variant='danger' onClick={deleteColumn} disabled={loading}>
                                                                     Delete Column
-                                                </Button>
+                                                                    </Button>
                                                             </Modal.Body>
                                                         </Modal>
                                                     </ListGroup>

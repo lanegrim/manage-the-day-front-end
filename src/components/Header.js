@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useHistory } from 'react-router-dom'
-import { Button, Alert, Nav } from 'react-bootstrap'
+import { Alert, Nav } from 'react-bootstrap'
 
 export default function Header() {
     const { currentUser, logout } = useAuth()
@@ -11,35 +11,38 @@ export default function Header() {
 
     async function handleLogout() {
         setError('')
+        setLoading(true)
 
         try {
             await logout()
+            setLoading(false)
             history.push('/login')
         } catch {
             setError('Failed to log out')
+            setLoading(false)
         }
     }
 
     return (
-        <Nav variant="pills">
-            <Nav.Item disabled={loading} >
-                <Nav.Link active href='/dashboard'>
-                    My Profile
+        <Nav variant="pills" className='header'>
+            <div className='nav-buttons-left'>
+                <Nav.Item disabled={loading} className='nav-button'>
+                    <Nav.Link active href='/dashboard'>
+                        My Profile
                 </Nav.Link>
-            </Nav.Item>
-            <Nav.Item onClick={handleLogout} disabled={loading} >
-                <Nav.Link active>
-                    Log Out {error && <Alert variant="danger">{error}</Alert>}
+                </Nav.Item>
+                <Nav.Item onClick={handleLogout} disabled={loading} className='nav-button'>
+                    <Nav.Link active>
+                        Log Out {error && <Alert variant="danger">{error}</Alert>}
+                    </Nav.Link>
+                </Nav.Item>
+                <Nav.Item disabled={loading} className='nav-button'>
+                    <Nav.Link active href='/'>
+                        Home
                 </Nav.Link>
-            </Nav.Item>
-            <Nav.Item disabled={loading} >
-                <Nav.Link active href='/'>
-                    Home
-                </Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
+                </Nav.Item>
+            </div>
                 Logged in as {currentUser.email}
-            </Nav.Item>
-        </Nav>
+        </Nav >
     )
 }

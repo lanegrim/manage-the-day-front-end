@@ -31,7 +31,7 @@ export default function ForgotPassword() {
     }
 
     return (
-        <Container style={{ maxWidth: "400px" }}>
+        <Container className='d-flex flex-column justify-content-center' style={{ maxWidth: "400px", height: "70vh" }}>
             <TitleCard />
             <Card>
                 <Card.Body>

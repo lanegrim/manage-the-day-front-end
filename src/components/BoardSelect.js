@@ -16,7 +16,6 @@ export default function BoardSelect() {
     const [boards, setBoards] = useState([])
     const [boardID, setBoardID] = useState('')
     const [boardName, setBoardName] = useState('')
-    const [boardColumnOrder, setBoardColumnOrder] = useState([])
     const [showEditModal, setShowEditModal] = useState(false)
 
     function getBoards() {
@@ -36,14 +35,12 @@ export default function BoardSelect() {
         setBoardID(event.currentTarget.id)
         setBoardName(event.currentTarget.name)
         setShowEditModal(true)
-        setBoardColumnOrder(boards)
     }
 
     function closeEditModal(event) {
         setBoardID('')
         setBoardName('')
         setShowEditModal(false)
-        setBoardColumnOrder([])
     }
 
     function editBoard(event) {
@@ -118,8 +115,10 @@ export default function BoardSelect() {
         <>
             <Header />
             <TitleCard />
-            <Container className='text-center' style={{ maxWidth: "400px" }}>
-                <h1>My Boards</h1>
+            <Container className='text-center board-select-column' style={{ maxWidth: "400px" }}>
+                <div className='title-pill'>
+                    <h2>My Boards</h2>
+                </div>
                 <Card>
                     <Card.Header>Select a Board</Card.Header>
                     <Card.Body>
@@ -127,11 +126,12 @@ export default function BoardSelect() {
                             {boards.map((board) => {
                                 if (board.owner === currentUser.email) {
                                     return <ListGroupItem key={board.id}>
-                                        <Button onClick={() => { history.push(`/boards/${board.id}`) }}>
+                                        <Button onClick={() => { history.push(`/boards/${board.id}`) }} className='board-btn'>
                                             <strong>{board.title}</strong>
                                             <p>Created by you</p>
                                         </Button>
                                         <Button
+                                            className='edit-btn'
                                             onClick={openEditModal}
                                             id={board.id}
                                             name={board.title}>
@@ -165,9 +165,16 @@ export default function BoardSelect() {
                                 }
                                 if (board.collaborators[0].indexOf(currentUser.email) !== -1) {
                                     return <ListGroupItem key={board.id}>
-                                        <Button onClick={() => { history.push(`/boards/${board.id}`) }}>
+                                        <Button onClick={() => { history.push(`/boards/${board.id}`) }} className='board-btn'>
                                             <strong>{board.title}</strong>
                                             <p>Created by {board.owner}</p>
+                                        </Button>
+                                        <Button
+                                            className='edit-btn'
+                                            disabled
+                                        >
+                                            <img alt='Edit'
+                                                src='/outline_edit_note_white_24dp.png' className='edit-img'></img>
                                         </Button>
                                     </ListGroupItem>
                                 }

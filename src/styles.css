@@ -1,11 +1,57 @@
-/* .contains-all {
-    max-width: 400px;
+.contains-all {
+    padding-bottom: 3em;
+}
+
+/* HEADER */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: .75em;
+    background-color: #292b2c;
+    color: white;
+}
+
+.nav-buttons-left {
+    display: flex;
+}
+
+.nav-button {
+    margin-right: .5em;
+}
+
+/* TITLE CARD */
+.title-card {
+    margin-left: .75em;
+}
+
+/* .app-title {
+
 } */
+
+/* BOARD/BOARD SELECT */
+
+.board-select-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.title-pill {
+    width: 75%;
+    padding: .25em;
+    border-radius: 40px;
+    margin-bottom:  .5em;
+    background-color: #292b2c;
+    color: white;
+}
 
 .columns {
     display: flex;
     overflow-x: scroll;
-    gap: 5%;
+    gap: 2.5%;
+    margin: auto 1em;
+    padding: auto 1em;
 }
 
 .board-column {
@@ -32,4 +78,30 @@
     justify-content: center;
     width: min-content;
     margin-left: 1em;
+}
+
+.board-btn {
+    width: 200px;
+    max-width: 200px;
+    overflow: wrap;
+}
+
+.collab-btn {
+    margin: 1em 0 0 1em;
+}
+
+@media(max-width:600px) {
+    .columns {
+        display: flex;
+        flex-direction: column;
+        overflow-y: scroll;
+        margin: auto 1em;
+        padding: auto 1em;
+    }
+
+    .board-column {
+        min-width: 325px;
+        min-height: 500px;
+        margin-bottom: 1em;
+    }
 }

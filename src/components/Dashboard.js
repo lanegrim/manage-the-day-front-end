@@ -15,11 +15,11 @@ export default function Dashboard() {
         <>
             <Header />
             <TitleCard />
-            <Container style={{ maxWidth: "400px" }}>
+            <Container className='d-flex align-items-center' style={{ maxWidth: "400px", height: "60vh" }}>
                 <Card>
                     <Card.Body>
                         <h2 className="text-center mb-4">
-                            Profile
+                            My Profile
                     </h2>
                         <strong>Email:</strong> {currentUser.email}
                         <Link to='/update-profile' className="btn btn-primary w-100 mt-3" >
