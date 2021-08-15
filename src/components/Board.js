@@ -520,7 +520,7 @@ export default function Board() {
                                                                 </form>
                                                                 <Button className="w-100 mt-2" variant='danger' onClick={deleteColumn} disabled={loading}>
                                                                     Delete Column
-                                                                    </Button>
+                                                                </Button>
                                                             </Modal.Body>
                                                         </Modal>
                                                     </ListGroup>
@@ -552,7 +552,7 @@ export default function Board() {
                                         </Form.Group>
                                         <Button className="w-100 mt-2" type="submit" variant='success' disabled={loading}>
                                             Create Column
-                                </Button>
+                                        </Button>
                                     </form>
                                 </Card.Body>
                             </Card>

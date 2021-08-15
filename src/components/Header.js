@@ -29,7 +29,7 @@ export default function Header() {
                 <Nav.Item disabled={loading} className='nav-button'>
                     <Nav.Link active href='/dashboard'>
                         My Profile
-                </Nav.Link>
+                    </Nav.Link>
                 </Nav.Item>
                 <Nav.Item onClick={handleLogout} disabled={loading} className='nav-button'>
                     <Nav.Link active>
@@ -39,10 +39,10 @@ export default function Header() {
                 <Nav.Item disabled={loading} className='nav-button'>
                     <Nav.Link active href='/'>
                         Home
-                </Nav.Link>
+                    </Nav.Link>
                 </Nav.Item>
             </div>
-                Logged in as {currentUser.email}
+            Logged in as {currentUser.email}
         </Nav >
     )
 }

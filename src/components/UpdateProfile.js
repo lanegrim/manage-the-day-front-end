@@ -53,7 +53,7 @@ export default function UpdateProfile() {
                     <Card.Body>
                         <h2 className="text-center mb-4">
                             Update Profile
-                    </h2>
+                        </h2>
                         {error && <Alert variant="danger">{error}</Alert>}
                         <form onSubmit={handleSubmit}>
                             <Form.Group id="email">
@@ -70,7 +70,7 @@ export default function UpdateProfile() {
                             </Form.Group>
                             <Button disabled={loading} className="w-100 mt-2" type="submit">
                                 Update
-                        </Button>
+                            </Button>
                         </form>
                     </Card.Body>
                 </Card>
