@@ -20,14 +20,14 @@ export default function Dashboard() {
                     <Card.Body>
                         <h2 className="text-center mb-4">
                             My Profile
-                    </h2>
+                        </h2>
                         <strong>Email:</strong> {currentUser.email}
                         <Link to='/update-profile' className="btn btn-primary w-100 mt-3" >
                             Update Profile
-                    </Link>
+                        </Link>
                         <Link to='/' className="btn btn-primary w-100 mt-3" >
                             Return to Board Selection
-                    </Link>
+                        </Link>
                     </Card.Body>
                 </Card>
             </Container>
