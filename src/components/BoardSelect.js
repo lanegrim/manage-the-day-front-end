@@ -154,7 +154,7 @@ export default function BoardSelect() {
                                                     </Form.Group>
                                                     <Button className="w-100 mt-2" type="submit" variant='success'>
                                                         Update Board
-                                                </Button>
+                                                    </Button>
                                                 </form>
                                                 <Button className="w-100 mt-2" variant='danger' onClick={deleteBoard}>
                                                     Delete Board
@@ -191,7 +191,7 @@ export default function BoardSelect() {
                                     </Form.Group>
                                     <Button className="w-100 mt-2" type="submit" variant='success' disabled={loading}>
                                         Create Board
-                                </Button>
+                                    </Button>
                                 </form>
                             </ListGroupItem>
                         </ListGroup>
