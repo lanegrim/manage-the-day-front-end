@@ -17,7 +17,7 @@ export default function UpdateProfile() {
     const [loading, setLoading] = useState(false)
     const history = useHistory()
 
-    function handleSubmit(event) {
+    const handleSubmit = (event) => {
         event.preventDefault()
         setError('')
         setLoading(true)
