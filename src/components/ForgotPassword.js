@@ -5,7 +5,6 @@ import React, { useRef, useState } from 'react'
 import { Form, Card, Button, Alert, Container } from 'react-bootstrap'
 import { useAuth } from '../contexts/AuthContext'
 import { Link } from 'react-router-dom'
-import Header from './Header'
 import TitleCard from './TitleCard'
 
 export default function ForgotPassword() {
